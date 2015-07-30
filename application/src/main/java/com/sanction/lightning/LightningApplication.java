@@ -17,7 +17,10 @@ public class LightningApplication extends Application<LightningConfiguration> {
 
   @Override
   public void run(LightningConfiguration config, Environment env) {
+    LightningComponent component = DaggerLightningComponent.builder()
+        .build();
 
+    env.jersey().register(component.getFacebookResource());
   }
 
 }
