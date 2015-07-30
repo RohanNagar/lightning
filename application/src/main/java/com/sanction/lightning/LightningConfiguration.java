@@ -1,4 +1,4 @@
-package com.rohannagar.lightning;
+package com.sanction.lightning;
 
 import io.dropwizard.Configuration;
 

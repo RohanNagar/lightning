@@ -1,4 +1,4 @@
-package com.rohannagar.lightning;
+package com.sanction.lightning;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -6,8 +6,8 @@ import io.dropwizard.setup.Environment;
 
 public class LightningApplication extends Application<LightningConfiguration> {
 
-  public static void main(String[] args) {
-    //new LightningApplication().run(args);
+  public static void main(String[] args) throws Exception {
+    new LightningApplication().run(args);
   }
 
   @Override
