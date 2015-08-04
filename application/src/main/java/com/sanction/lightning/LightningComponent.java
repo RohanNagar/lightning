@@ -6,7 +6,7 @@ import dagger.Component;
 import javax.inject.Singleton;
 
 @Singleton
-@Component
+@Component(modules = {LightningModule.class})
 public interface LightningComponent {
 
   FacebookResource getFacebookResource();

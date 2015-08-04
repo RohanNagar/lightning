@@ -19,11 +19,16 @@ public class LightningApplication extends Application<LightningConfiguration> {
 
   @Override
   public void run(LightningConfiguration config, Environment env) {
-    LightningComponent component = DaggerLightningComponent.builder()
-        .build();
-
-    ThunderBuilder thunderBuilder = new ThunderBuilder("http://localhost:9000", "user", "secret");
+    // Set up Thunder client
+    ThunderBuilder thunderBuilder = new ThunderBuilder(
+        config.getThunderConfiguration().getEndpoint(),
+        config.getThunderConfiguration().getUserKey(),
+        config.getThunderConfiguration().getUserSecret());
     ThunderClient thunderClient = thunderBuilder.newThunderClient();
+
+    LightningComponent component = DaggerLightningComponent.builder()
+        .lightningModule(new LightningModule(thunderClient))
+        .build();
 
     env.jersey().register(component.getFacebookResource());
   }
