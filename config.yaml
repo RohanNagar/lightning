@@ -1,4 +1,19 @@
 thunder:
-  endpoint: "http://localhost:9000"
+  endpoint: "http://localhost:8080"
   user-key: "lightning"
-  user-secret: "h32890alkjq3szd8fqn3"
+  user-secret: "secret"
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 9000
+  adminConnectors:
+    - type: http
+      port: 9001
+
+# Approved Authentication Credentials
+approved-keys:
+  - application: lightning
+    secret: secret
+  - application: lightning
+    secret: secret2

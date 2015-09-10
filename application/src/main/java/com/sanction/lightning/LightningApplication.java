@@ -1,8 +1,12 @@
 package com.sanction.lightning;
 
+import com.sanction.lightning.authentication.Key;
+import com.sanction.lightning.authentication.LightningAuthenticator;
 import com.sanction.thunder.ThunderBuilder;
 import com.sanction.thunder.ThunderClient;
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -29,8 +33,8 @@ public class LightningApplication extends Application<LightningConfiguration> {
     LightningComponent component = DaggerLightningComponent.builder()
         .lightningModule(new LightningModule(thunderClient))
         .build();
-
+    env.jersey().register(AuthFactory.binder(new BasicAuthFactory<>
+            (new LightningAuthenticator(config.getApprovedKeys()), "AUTHENTICATION", Key.class)));
     env.jersey().register(component.getFacebookResource());
   }
-
 }
