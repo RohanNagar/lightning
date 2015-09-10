@@ -25,9 +25,10 @@
     <dagger.version>2.0.1</dagger.version>
     <dropwizard.version>0.8.2</dropwizard.version>
     <thunder.version>0.1.0</thunder.version>
+    <restfb.version>1.14.1</restfb.version>
   </properties>
 
-  <!-- Allows for releases into AWS S3. -->
+  <!-- Allows for releases into AWS S3. -->q
   <distributionManagement>
     <repository>
       <id>maven-s3-release-repo</id>
@@ -141,6 +142,16 @@
       <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-core</artifactId>
+        <version>${dropwizard.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.restfb</groupId>
+        <artifactId>restfb</artifactId>
+        <version>${restfb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-auth</artifactId>
         <version>${dropwizard.version}</version>
       </dependency>
     </dependencies>

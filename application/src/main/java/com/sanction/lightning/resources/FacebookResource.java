@@ -1,6 +1,8 @@
 package com.sanction.lightning.resources;
 
+import com.sanction.lightning.authentication.Key;
 import com.sanction.thunder.ThunderClient;
+import io.dropwizard.auth.Auth;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -18,7 +20,7 @@ public class FacebookResource {
 
   @GET
   @Path("/newsFeed")
-  public Response getNewsFeed() {
+  public Response getNewsFeed(@Auth Key key) {
     return Response.status(Response.Status.ACCEPTED).entity("Worked!").build();
   }
 }
