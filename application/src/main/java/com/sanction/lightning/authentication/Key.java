@@ -3,8 +3,7 @@ package com.sanction.lightning.authentication;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
-
-import java.util.Objects;
+import com.google.common.base.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,8 +44,13 @@ public class Key {
     }
 
     Key other = (Key) key;
-    return Objects.equals(this.application, other.application)
-            && Objects.equals(this.secret, other.secret);
+    return Objects.equal(this.application, other.application)
+        && Objects.equal(this.secret, other.secret);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(this.application, this.secret);
   }
 
   @Override

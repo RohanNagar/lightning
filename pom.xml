@@ -28,7 +28,7 @@
     <restfb.version>1.14.1</restfb.version>
   </properties>
 
-  <!-- Allows for releases into AWS S3. -->q
+  <!-- Allows for releases into AWS S3. -->
   <distributionManagement>
     <repository>
       <id>maven-s3-release-repo</id>

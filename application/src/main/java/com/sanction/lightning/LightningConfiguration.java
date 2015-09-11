@@ -5,9 +5,10 @@ import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.config.ThunderConfiguration;
 import io.dropwizard.Configuration;
 
+import java.util.List;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 public class LightningConfiguration extends Configuration {
 

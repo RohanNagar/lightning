@@ -33,8 +33,9 @@ public class LightningApplication extends Application<LightningConfiguration> {
     LightningComponent component = DaggerLightningComponent.builder()
         .lightningModule(new LightningModule(thunderClient))
         .build();
-    env.jersey().register(AuthFactory.binder(new BasicAuthFactory<>
-            (new LightningAuthenticator(config.getApprovedKeys()), "AUTHENTICATION", Key.class)));
+
+    env.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
+        new LightningAuthenticator(config.getApprovedKeys()), "AUTHENTICATION", Key.class)));
     env.jersey().register(component.getFacebookResource());
   }
 }
