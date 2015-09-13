@@ -26,6 +26,8 @@
     <dropwizard.version>0.8.2</dropwizard.version>
     <thunder.version>0.1.0</thunder.version>
     <restfb.version>1.14.1</restfb.version>
+    <jackson.api.version>2.5.0</jackson.api.version>
+    <guava.version>18.0</guava.version>
   </properties>
 
   <!-- Allows for releases into AWS S3. -->
@@ -154,9 +156,18 @@
         <artifactId>dropwizard-auth</artifactId>
         <version>${dropwizard.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.api.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
-
   <modules>
     <module>api</module>
     <module>application</module>

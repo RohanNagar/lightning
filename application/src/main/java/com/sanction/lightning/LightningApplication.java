@@ -2,6 +2,7 @@ package com.sanction.lightning;
 
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.authentication.LightningAuthenticator;
+import com.sanction.lightning.facebook.FacebookModule;
 import com.sanction.thunder.ThunderBuilder;
 import com.sanction.thunder.ThunderClient;
 import io.dropwizard.Application;
@@ -32,6 +33,7 @@ public class LightningApplication extends Application<LightningConfiguration> {
 
     LightningComponent component = DaggerLightningComponent.builder()
         .lightningModule(new LightningModule(thunderClient))
+        .facebookModule(new FacebookModule(config.getFacebookApplicationKey()))
         .build();
 
     env.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
