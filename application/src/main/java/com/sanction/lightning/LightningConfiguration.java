@@ -3,6 +3,7 @@ package com.sanction.lightning;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.config.ThunderConfiguration;
+import com.sanction.lightning.facebook.FacebookApplicationKey;
 import io.dropwizard.Configuration;
 
 import java.util.List;
@@ -26,7 +27,16 @@ public class LightningConfiguration extends Configuration {
   @JsonProperty("approved-keys")
   private final List<Key> approvedKeys = null;
 
-  public final List<Key> getApprovedKeys() {
+  public List<Key> getApprovedKeys() {
     return approvedKeys;
+  }
+
+  @NotNull
+  @Valid
+  @JsonProperty("facebook-auth")
+  private final FacebookApplicationKey facebookApplicationKey = null;
+
+  public FacebookApplicationKey getFacebookApplicationKey() {
+    return facebookApplicationKey;
   }
 }
