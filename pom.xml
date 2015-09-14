@@ -24,10 +24,12 @@
     <checkstyle.version>6.1.1</checkstyle.version>
     <dagger.version>2.0.1</dagger.version>
     <dropwizard.version>0.8.2</dropwizard.version>
+    <guava.version>18.0</guava.version>
     <thunder.version>0.1.0</thunder.version>
     <restfb.version>1.14.1</restfb.version>
     <jackson.api.version>2.5.0</jackson.api.version>
-    <guava.version>18.0</guava.version>
+    <junit.version>4.12</junit.version>
+    <mockito.version>1.10.19</mockito.version>
   </properties>
 
   <!-- Allows for releases into AWS S3. -->
@@ -166,8 +168,19 @@
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
       </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+
   <modules>
     <module>api</module>
     <module>application</module>
