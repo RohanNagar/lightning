@@ -4,10 +4,13 @@ import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookApplicationKey;
 import com.sanction.lightning.facebook.FacebookProvider;
+import com.sanction.lightning.models.FacebookPost;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.StormUser;
 import io.dropwizard.auth.Auth;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -34,7 +37,7 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches a user object containing user information.
+   * Fetches a FacebookUser object containing user information.
    * @param key
    * @param username
    * @return a json object containing all the user information
@@ -44,7 +47,7 @@ public class FacebookResource {
   public Response getUser(@Auth Key key, @QueryParam("username") String username) {
     if (username == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-              .entity("'username' query parameter is required for getUser").build();
+              .entity("'username' query parameter is required").build();
     }
 
     StormUser stormUser = thunderClient.getUser(username);
@@ -60,5 +63,35 @@ public class FacebookResource {
     }
 
     return Response.status(Response.Status.ACCEPTED).entity(facebookUser).build();
+  }
+
+  /**
+   * Fetches a List of FacebookPost objects.
+   * @param key
+   * @param username
+   * @return a list of posts formatted in json
+   */
+
+  @GET
+  @Path("/newsfeed")
+  public Response getNewsfeed(@Auth Key key, @QueryParam("username") String username) {
+    if (username == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("'username' query parameter is required").build();
+    }
+
+    StormUser stormUser = thunderClient.getUser(username);
+
+    List<FacebookPost> facebookFeed = null;
+    try {
+      facebookFeed = new FacebookProvider(stormUser.getFacebookAccessToken(),
+              applicationKey).getFacebookFeed();
+    } catch (FacebookOAuthException e) {
+      LOG.error("Bad Facebook OAuth Toke", e);
+      return Response.status(Response.Status.NOT_FOUND)
+              .entity("Request rejected due to bad OAuth token").build();
+    }
+
+    return Response.status(Response.Status.ACCEPTED).entity(facebookFeed).build();
   }
 }
