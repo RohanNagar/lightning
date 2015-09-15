@@ -1,15 +1,8 @@
+# Thunder Access
 thunder:
-  endpoint: "http://localhost:8080"
-  user-key: "lightning"
-  user-secret: "secret"
-
-server:
-  applicationConnectors:
-    - type: http
-      port: 9000
-  adminConnectors:
-    - type: http
-      port: 9001
+  endpoint: http://localhost:8080
+  user-key: lightning
+  user-secret: 12345
 
 # Approved Authentication Credentials
 approved-keys:
@@ -19,6 +12,15 @@ approved-keys:
     secret: secret2
 
 # Application Auth Keys
-facebook-auth:
+facebook:
     app-id: 896501930437172
     app-secret: 303d6076cc840d8e7bc5d36b2cb9fbc6
+
+# Server Configuration
+server:
+  applicationConnectors:
+    - type: http
+      port: 9000
+  adminConnectors:
+    - type: http
+      port: 9001

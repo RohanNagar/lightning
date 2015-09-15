@@ -2,7 +2,7 @@ package com.sanction.lightning.resources;
 
 import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
-import com.sanction.lightning.facebook.FacebookApplicationKey;
+import com.sanction.lightning.facebook.FacebookConfiguration;
 import com.sanction.lightning.facebook.FacebookProvider;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.thunder.ThunderClient;
@@ -25,12 +25,13 @@ import org.slf4j.LoggerFactory;
 public class FacebookResource {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookResource.class);
   private final ThunderClient thunderClient;
-  private final FacebookApplicationKey applicationKey;
+  private final FacebookConfiguration facebookConfiguration;
 
   @Inject
-  public FacebookResource(ThunderClient thunderClient, FacebookApplicationKey applicationKey) {
+  public FacebookResource(ThunderClient thunderClient,
+                          FacebookConfiguration facebookConfiguration) {
     this.thunderClient = thunderClient;
-    this.applicationKey = applicationKey;
+    this.facebookConfiguration = facebookConfiguration;
   }
 
   /**
@@ -52,7 +53,7 @@ public class FacebookResource {
     FacebookUser facebookUser;
     try {
       facebookUser = new FacebookProvider(stormUser.getFacebookAccessToken(),
-              applicationKey).getFacebookUser();
+          facebookConfiguration.getAppSecret()).getFacebookUser();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth Token", e);
       return Response.status(Response.Status.NOT_FOUND)

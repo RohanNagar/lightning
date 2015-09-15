@@ -1,7 +1,7 @@
 package com.sanction.lightning.resources;
 
 import com.sanction.lightning.authentication.Key;
-import com.sanction.lightning.facebook.FacebookApplicationKey;
+import com.sanction.lightning.facebook.FacebookConfiguration;
 import com.sanction.thunder.ThunderClient;
 
 import javax.ws.rs.core.Response;
@@ -13,10 +13,10 @@ import static org.mockito.Mockito.mock;
 
 public class FacebookResourceTest {
   private final ThunderClient client = mock(ThunderClient.class);
-  private final FacebookApplicationKey appKey = mock(FacebookApplicationKey.class);
+  private final FacebookConfiguration config = mock(FacebookConfiguration.class);
   private final Key key = mock(Key.class);
 
-  private final FacebookResource resource = new FacebookResource(client, appKey);
+  private final FacebookResource resource = new FacebookResource(client, config);
 
   @Test
   public void testGetNullUsername() {

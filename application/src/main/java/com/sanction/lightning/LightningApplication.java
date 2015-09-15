@@ -33,7 +33,7 @@ public class LightningApplication extends Application<LightningConfiguration> {
 
     LightningComponent component = DaggerLightningComponent.builder()
         .lightningModule(new LightningModule(thunderClient))
-        .facebookModule(new FacebookModule(config.getFacebookApplicationKey()))
+        .facebookModule(new FacebookModule(config.getFacebookConfiguration()))
         .build();
 
     // Authentication

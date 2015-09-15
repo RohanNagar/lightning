@@ -7,15 +7,15 @@ import javax.inject.Singleton;
 
 @Module
 public class FacebookModule {
-  private final FacebookApplicationKey facebookApplicationKey;
+  private final FacebookConfiguration facebookConfiguration;
 
-  public FacebookModule(FacebookApplicationKey applicationKey) {
-    this.facebookApplicationKey = applicationKey;
+  public FacebookModule(FacebookConfiguration facebookConfiguration) {
+    this.facebookConfiguration = facebookConfiguration;
   }
 
   @Singleton
   @Provides
-  public FacebookApplicationKey provideFacebookAuth() {
-    return facebookApplicationKey;
+  public FacebookConfiguration provideFacebookConfiguration() {
+    return facebookConfiguration;
   }
 }
