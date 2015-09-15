@@ -34,10 +34,10 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches a user object containing user information.
-   * @param key
-   * @param username
-   * @return a json object containing all the user information
+   * Fetches a FacebookUser object containing user information.
+   * @param key The authentication key for the requesting application.
+   * @param username The username of the StormUser to get FacebookUser information for.
+   * @return The FacebookUser object corresponding to the Storm username.
    */
   @GET
   @Path("/users")
@@ -49,7 +49,7 @@ public class FacebookResource {
 
     StormUser stormUser = thunderClient.getUser(username);
 
-    FacebookUser facebookUser = null;
+    FacebookUser facebookUser;
     try {
       facebookUser = new FacebookProvider(stormUser.getFacebookAccessToken(),
               applicationKey).getFacebookUser();

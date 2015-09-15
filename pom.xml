@@ -129,6 +129,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.api.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.dagger</groupId>
         <artifactId>dagger</artifactId>
         <version>${dagger.version}</version>
@@ -139,14 +144,9 @@
         <version>${dagger.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.sanction.thunder</groupId>
-        <artifactId>client</artifactId>
-        <version>${thunder.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.dropwizard</groupId>
-        <artifactId>dropwizard-core</artifactId>
-        <version>${dropwizard.version}</version>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>com.restfb</groupId>
@@ -154,19 +154,19 @@
         <version>${restfb.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.sanction.thunder</groupId>
+        <artifactId>client</artifactId>
+        <version>${thunder.version}</version>
+      </dependency>
+      <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-auth</artifactId>
         <version>${dropwizard.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.api.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${guava.version}</version>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-core</artifactId>
+        <version>${dropwizard.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
