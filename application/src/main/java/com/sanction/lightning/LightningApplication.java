@@ -36,8 +36,12 @@ public class LightningApplication extends Application<LightningConfiguration> {
         .facebookModule(new FacebookModule(config.getFacebookApplicationKey()))
         .build();
 
+    // Authentication
     env.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
         new LightningAuthenticator(config.getApprovedKeys()), "AUTHENTICATION", Key.class)));
+
+    // Resources
     env.jersey().register(component.getFacebookResource());
+    env.jersey().register(component.getTwitterResource());
   }
 }
