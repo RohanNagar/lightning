@@ -6,7 +6,7 @@ import com.sanction.lightning.facebook.FacebookProvider;
 import com.sanction.lightning.facebook.FacebookProviderFactory;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.thunder.ThunderClient;
-import com.sanction.thunder.models.StormUser;
+import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
 
 import javax.inject.Inject;
@@ -49,9 +49,9 @@ public class FacebookResource {
               .entity("'username' query parameter is required for getUser").build();
     }
 
-    StormUser stormUser = thunderClient.getUser(username);
+    PilotUser pilotUser = thunderClient.getUser(username);
     FacebookProvider facebookProvider
-        = facebookProviderFactory.newFacebookProvider(stormUser.getFacebookAccessToken());
+        = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
 
     FacebookUser facebookUser;
     try {

@@ -25,7 +25,7 @@
     <dagger.version>2.0.1</dagger.version>
     <dropwizard.version>0.8.2</dropwizard.version>
     <guava.version>18.0</guava.version>
-    <thunder.version>0.1.0</thunder.version>
+    <thunder.version>0.3.0</thunder.version>
     <restfb.version>1.14.1</restfb.version>
     <jackson.api.version>2.5.0</jackson.api.version>
     <junit.version>4.12</junit.version>

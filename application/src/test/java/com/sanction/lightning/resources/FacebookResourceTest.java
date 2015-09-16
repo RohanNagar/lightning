@@ -6,7 +6,7 @@ import com.sanction.lightning.facebook.FacebookProvider;
 import com.sanction.lightning.facebook.FacebookProviderFactory;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.thunder.ThunderClient;
-import com.sanction.thunder.models.StormUser;
+import com.sanction.thunder.models.PilotUser;
 
 import javax.ws.rs.core.Response;
 
@@ -24,7 +24,7 @@ public class FacebookResourceTest {
   private final FacebookProvider facebookProvider = mock(FacebookProvider.class);
   private final Key key = mock(Key.class);
 
-  private final StormUser stormUser = mock(StormUser.class);
+  private final PilotUser pilotUser = mock(PilotUser.class);
   private final FacebookUser facebookUser = mock(FacebookUser.class);
 
   private final FacebookResource resource = new FacebookResource(client, providerFactory);
@@ -32,9 +32,9 @@ public class FacebookResourceTest {
   @Before
   public void setup() {
     when(providerFactory.newFacebookProvider(anyString())).thenReturn(facebookProvider);
-    when(client.getUser(anyString())).thenReturn(stormUser);
+    when(client.getUser(anyString())).thenReturn(pilotUser);
 
-    when(stormUser.getFacebookAccessToken()).thenReturn("fbAccessToken");
+    when(pilotUser.getFacebookAccessToken()).thenReturn("fbAccessToken");
 
     when(facebookUser.getFacebookId()).thenReturn("1");
     when(facebookUser.getFirstName()).thenReturn("Bill");
