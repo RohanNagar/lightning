@@ -1,6 +1,7 @@
 package com.sanction.lightning.resources;
 
 import com.sanction.lightning.authentication.Key;
+import com.sanction.lightning.twitter.TwitterServiceFactory;
 import com.sanction.thunder.ThunderClient;
 import io.dropwizard.auth.Auth;
 
@@ -16,10 +17,13 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class TwitterResource {
   private final ThunderClient thunderClient;
+  private final TwitterServiceFactory twitterServiceFactory;
 
   @Inject
-  public TwitterResource(ThunderClient thunderClient) {
+  public TwitterResource(ThunderClient thunderClient,
+                         TwitterServiceFactory twitterServiceFactory) {
     this.thunderClient = thunderClient;
+    this.twitterServiceFactory = twitterServiceFactory;
   }
 
   /**

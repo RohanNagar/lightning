@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.config.ThunderConfiguration;
 import com.sanction.lightning.facebook.FacebookConfiguration;
+import com.sanction.lightning.twitter.TwitterConfiguration;
 import io.dropwizard.Configuration;
 
 import java.util.List;
@@ -29,6 +30,15 @@ public class LightningConfiguration extends Configuration {
 
   public FacebookConfiguration getFacebookConfiguration() {
     return facebookConfiguration;
+  }
+
+  @NotNull
+  @Valid
+  @JsonProperty("twitter")
+  private final TwitterConfiguration twitterConfiguration = null;
+
+  public TwitterConfiguration getTwitterConfiguration() {
+    return twitterConfiguration;
   }
 
   @NotNull
