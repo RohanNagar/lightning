@@ -13,4 +13,8 @@ public class TwitterServiceFactory {
   public TwitterService newTwitterService(String userKey, String userSecret) {
     return new TwitterService(applicationKey, applicationSecret, userKey, userSecret);
   }
+
+  public TwitterService newTwitterService() {
+    return new TwitterService(applicationKey, applicationSecret);
+  }
 }
