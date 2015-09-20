@@ -191,7 +191,7 @@ public class FacebookResourceTest {
   public void testGetExtendedToken() {
     String testToken = "Test";
     when(facebookProvider.getFacebookExtendedToken()).thenReturn(testToken);
-    when(thunderClient.postUser(any(PilotUser.class))).thenReturn(pilotUser);
+    when(thunderClient.updateUser(any(PilotUser.class))).thenReturn(pilotUser);
 
     Response response = resource.getExtendedToken(key, "Test");
     String string = (String) response.getEntity();
