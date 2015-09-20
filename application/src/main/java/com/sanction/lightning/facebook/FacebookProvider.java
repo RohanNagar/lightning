@@ -16,14 +16,15 @@ import com.sanction.lightning.models.FacebookUser;
 import java.util.List;
 
 public class FacebookProvider {
+  private static final String REDIRECT_URL = "example.com";
 
-  private static final String REDIRECT_LINK = "example.com";
   private final DefaultFacebookClient client;
   private final String appId;
   private final String appSecret;
 
   /**
    * Constructs a new FacebookProvider for making requests to Facebook.
+   *
    * @param facebookAccessToken The access token for the user.
    * @param facebookApplicationId The facebook application id
    * @param facebookApplicationSecret The authenticating application secret.
@@ -38,8 +39,9 @@ public class FacebookProvider {
 
   /**
    * Constructs a new FacebookProvider for making requests to Facebook.
-   * @param facebookApplicationSecret The authenticating application secret.
-   * @param facebookApplicationId The facebook application id
+   *
+   * @param facebookApplicationId The Facebook consumer application id.
+   * @param facebookApplicationSecret The Facebook consumer application secret.
    */
   public FacebookProvider(String facebookApplicationId, String facebookApplicationSecret) {
     this.client = new DefaultFacebookClient(Version.VERSION_2_4);
@@ -49,6 +51,7 @@ public class FacebookProvider {
 
   /**
    * Gets Facebook user information for a specific user.
+   *
    * @return A FacebookUser object containing user information.
    */
   public FacebookUser getFacebookUser() {
@@ -57,18 +60,19 @@ public class FacebookProvider {
   }
 
   /**
-   * Gets the users photos.
-   * @return an array of URLs representing the users photos
+   * Gets the user's photos.
+   *
+   * @return A list of URLs representing the users photos.
    */
   public List<String> getFacebookUserPhotos() {
-    //fetch a json object containing an array of photos, each with specified properties
+    // Fetch a json object containing an array of photos, each with specified properties
     JsonObject photos = client.fetchObject("me/photos", JsonObject.class,
             Parameter.with("type", "uploaded"), Parameter.with("fields", "link"));
 
-    //fetch the array from JsonObject and make a JsonArray
+    // Fetch the array from JsonObject and make a JsonArray
     JsonArray photosArray = photos.getJsonArray("data");
 
-    //construct a new list of url strings to return
+    // Construct a new list of url strings to return
     List<String> urlList = Lists.newArrayList();
     for (int i = 0; i < photosArray.length(); i++) {
       urlList.add(photosArray.getJsonObject(i).getString("link"));
@@ -78,8 +82,9 @@ public class FacebookProvider {
   }
 
   /**
-   * Gets the users videos from facebook.
-   * @return list of url's representing the videos
+   * Gets the user's videos from Facebook.
+   *
+   * @return A list of URLs representing the videos.
    */
   public List<String> getFacebookUserVideos() {
     JsonObject videos = client.fetchObject("me/videos", JsonObject.class,
@@ -96,7 +101,8 @@ public class FacebookProvider {
 
   /**
    * Sets the specified users permissions.
-   * @return url string for the permissions url
+   *
+   * @return The URL string for the permissions URL.
    */
   public String getOauthUrl() {
     ScopeBuilder scopeBuilder = new ScopeBuilder();
@@ -104,12 +110,13 @@ public class FacebookProvider {
     scopeBuilder.addPermission(UserDataPermissions.USER_VIDEOS);
     scopeBuilder.addPermission(UserDataPermissions.USER_POSTS);
 
-    return client.getLoginDialogUrl(appId, REDIRECT_LINK, scopeBuilder);
+    return client.getLoginDialogUrl(appId, REDIRECT_URL, scopeBuilder);
   }
 
   /**
-   * Fetches an extended token from facebook.
-   * @return an extended token given an existing token
+   * Fetches an extended token from Facebook.
+   *
+   * @return An extended token, using the existing token.
    */
   public String getFacebookExtendedToken() {
     AccessToken accessToken = client

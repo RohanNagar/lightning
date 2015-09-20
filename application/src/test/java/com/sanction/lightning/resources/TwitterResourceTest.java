@@ -41,6 +41,7 @@ public class TwitterResourceTest {
     when(pilotUser.getTwitterAccessSecret()).thenReturn("twitterAccessSecret");
   }
 
+  /* User Tests */
   @Test
   public void testGetUserWithNullUsername() {
     Response response = resource.getUser(key, null);
@@ -69,6 +70,7 @@ public class TwitterResourceTest {
     assertEquals(user, mockUser);
   }
 
+  /* OAuth Token Tests */
   @Test
   public void testGetOAuthTokenFailure() {
     when(service.getAuthorizationUrl()).thenReturn(null);

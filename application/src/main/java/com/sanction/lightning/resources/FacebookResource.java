@@ -38,6 +38,7 @@ public class FacebookResource {
 
   /**
    * Fetches a FacebookUser object containing user information.
+   *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get FacebookUser information for.
    * @return The FacebookUser object corresponding to the Pilot username.
@@ -68,6 +69,7 @@ public class FacebookResource {
 
   /**
    * Fetches all the photos of a specific user.
+   *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get photos for.
    * @return A list of the photos uploaded by the user.
@@ -98,6 +100,7 @@ public class FacebookResource {
 
   /**
    * Fetches all the videos of a specific user.
+   *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get videos for.
    * @return A list of the videos uploaded by the user.
@@ -128,9 +131,10 @@ public class FacebookResource {
 
   /**
    * Fetches a an extended token given an existing token.
+   *
    * @param key The authentication key for the requesting application.
-   * @param username the name of the PilotUser to fetch an extended token for
-   * @return an extended Facebook user token
+   * @param username The name of the PilotUser to fetch an extended token for.
+   * @return An extended Facebook user token.
    */
   @GET
   @Path("/extendedToken")
@@ -167,8 +171,9 @@ public class FacebookResource {
 
   /**
    * Fetches the loginDialogUrl for setting user permissions with Facebook.
+   *
    * @param key The authentication key for the requesting application.
-   * @return the url string used to set permissions.
+   * @return The url string used to set permissions.
    */
   @GET
   @Path("/oauthUrl")

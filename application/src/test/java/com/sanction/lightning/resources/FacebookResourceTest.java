@@ -10,7 +10,6 @@ import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
 import java.util.List;
-
 import javax.ws.rs.core.Response;
 
 import org.junit.Before;
@@ -26,19 +25,22 @@ public class FacebookResourceTest {
   private final ThunderClient thunderClient = mock(ThunderClient.class);
   private final FacebookProviderFactory providerFactory = mock(FacebookProviderFactory.class);
   private final FacebookProvider facebookProvider = mock(FacebookProvider.class);
-  private final Key key = mock(Key.class);
 
   private final PilotUser pilotUser = mock(PilotUser.class);
+  private final Key key = mock(Key.class);
 
   private final FacebookResource resource = new FacebookResource(thunderClient, providerFactory);
 
   @Before
   public void setup() {
+    // Setup ProviderFactory
     when(providerFactory.newFacebookProvider(anyString())).thenReturn(facebookProvider);
     when(providerFactory.newFacebookProvider()).thenReturn(facebookProvider);
 
+    // Setup ThunderClient
     when(thunderClient.getUser(anyString())).thenReturn(pilotUser);
 
+    // Setup PilotUser
     when(pilotUser.getFacebookAccessToken()).thenReturn("fbAccessToken");
   }
 
@@ -115,6 +117,7 @@ public class FacebookResourceTest {
   @SuppressWarnings("unchecked")
   public void testGetVideosWithOauthException() {
     when(facebookProvider.getFacebookUserVideos()).thenThrow(FacebookOAuthException.class);
+
     Response response = resource.getVideos(key, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
@@ -138,6 +141,7 @@ public class FacebookResourceTest {
   @SuppressWarnings("unchecked")
   public void testGetOauthUrlWithOauthException() {
     when(facebookProvider.getOauthUrl()).thenThrow(FacebookOAuthException.class);
+
     Response response = resource.getOauthUrl(key);
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
@@ -163,8 +167,10 @@ public class FacebookResourceTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testGetExtendedTokenWithOauthException() {
     when(facebookProvider.getFacebookExtendedToken()).thenThrow(FacebookOAuthException.class);
+
     Response response = resource.getExtendedToken(key, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
