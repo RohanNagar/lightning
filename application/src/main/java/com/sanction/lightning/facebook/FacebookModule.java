@@ -16,6 +16,7 @@ public class FacebookModule {
   @Singleton
   @Provides
   public FacebookProviderFactory provideFacebookProviderFactory() {
-    return new FacebookProviderFactory(facebookConfiguration.getAppSecret());
+    return new FacebookProviderFactory(facebookConfiguration.getAppId(),
+            facebookConfiguration.getAppSecret());
   }
 }

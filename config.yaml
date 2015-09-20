@@ -2,7 +2,7 @@
 thunder:
   endpoint: http://localhost:8080
   user-key: lightning
-  user-secret: 12345
+  user-secret: secret
 
 # Approved Authentication Credentials
 approved-keys:
