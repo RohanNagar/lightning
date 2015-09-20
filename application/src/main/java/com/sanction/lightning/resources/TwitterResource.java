@@ -1,9 +1,11 @@
 package com.sanction.lightning.resources;
 
 import com.sanction.lightning.authentication.Key;
+import com.sanction.lightning.models.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
 import com.sanction.thunder.ThunderClient;
+import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
 
 import javax.inject.Inject;
@@ -42,7 +44,18 @@ public class TwitterResource {
           .entity("'username' query parameter is required.").build();
     }
 
-    return Response.ok("Worked").build();
+    PilotUser pilotUser = thunderClient.getUser(username);
+    TwitterService service = twitterServiceFactory.newTwitterService(
+        pilotUser.getTwitterAccessToken(),
+        pilotUser.getTwitterAccessSecret());
+
+    TwitterUser user = service.getTwitterUser();
+    if (user == null) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+          .entity("Unable to retrieve information from Twitter.").build();
+    }
+
+    return Response.ok(user).build();
   }
 
   /**
@@ -53,7 +66,7 @@ public class TwitterResource {
    */
   @GET
   @Path("/oauthUrl")
-  public Response getOAuthToken(@Auth Key key) {
+  public Response getOAuthUrl(@Auth Key key) {
     TwitterService service = twitterServiceFactory.newTwitterService();
 
     String url = service.getAuthorizationUrl();

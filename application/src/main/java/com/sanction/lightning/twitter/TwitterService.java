@@ -1,10 +1,12 @@
 package com.sanction.lightning.twitter;
 
+import com.sanction.lightning.models.TwitterUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.User;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterService {
@@ -41,6 +43,34 @@ public class TwitterService {
         .setOAuthConsumerKey(applicationKey)
         .setOAuthConsumerSecret(applicationSecret)
         .build()).getInstance();
+  }
+
+  /**
+   * Retrieves the TwitterUser information for the current authenticated user.
+   *
+   * @return The TwitterUser object representing the user's information from Twitter.
+   */
+  public TwitterUser getTwitterUser() {
+    User twitterUser;
+    try {
+      long userId = twitterClient.getId();
+      twitterUser = twitterClient.showUser(userId);
+    } catch (TwitterException e) {
+      LOG.error("Unable to get user from Twitter. "
+          + "Twitter error code: {}", e.getErrorCode(), e);
+      return null;
+    }
+
+    return new TwitterUser(
+        twitterUser.getId(),
+        twitterUser.getFavouritesCount(),
+        twitterUser.getFollowersCount(),
+        twitterUser.getCreatedAt().toString(),
+        twitterUser.getLocation(),
+        twitterUser.getName(),
+        twitterUser.getScreenName(),
+        twitterUser.getProfileImageURL(),
+        twitterUser.isVerified());
   }
 
   /**
