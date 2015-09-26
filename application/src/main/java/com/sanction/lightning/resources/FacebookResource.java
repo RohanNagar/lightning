@@ -4,7 +4,9 @@ import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookProvider;
 import com.sanction.lightning.facebook.FacebookProviderFactory;
+import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookUser;
+import com.sanction.lightning.models.FacebookVideo;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
@@ -86,16 +88,16 @@ public class FacebookResource {
     FacebookProvider facebookProvider
             = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
 
-    List<String> urlList;
+    List<FacebookPhoto> photoList;
     try {
-      urlList = facebookProvider.getFacebookUserPhotos();
+      photoList = facebookProvider.getFacebookUserPhotos();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token for username {}", username, e);
       return Response.status(Response.Status.NOT_FOUND)
               .entity("Request rejected due to bad OAuth token").build();
     }
 
-    return Response.ok(urlList).build();
+    return Response.ok(photoList).build();
   }
 
   /**
@@ -117,16 +119,16 @@ public class FacebookResource {
     FacebookProvider facebookProvider
             = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
 
-    List<String> urlList;
+    List<FacebookVideo> videoList;
     try {
-      urlList = facebookProvider.getFacebookUserVideos();
+      videoList = facebookProvider.getFacebookUserVideos();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token for username {}", username, e);
       return Response.status(Response.Status.NOT_FOUND)
               .entity("Request rejected due to bad OAuth token").build();
     }
 
-    return Response.ok(urlList).build();
+    return Response.ok(videoList).build();
   }
 
   /**
