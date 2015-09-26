@@ -5,7 +5,9 @@ import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookProvider;
 import com.sanction.lightning.facebook.FacebookProviderFactory;
+import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookUser;
+import com.sanction.lightning.models.FacebookVideo;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
@@ -95,11 +97,11 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetPhotos() {
-    List<String> fakeList = Lists.newArrayList();
+    List<FacebookPhoto> fakeList = Lists.newArrayList();
     when(facebookProvider.getFacebookUserPhotos()).thenReturn(fakeList);
 
     Response response = resource.getPhotos(key, "Test");
-    List<String> userResponse = (List<String>) response.getEntity();
+    List<FacebookPhoto> userResponse = (List<FacebookPhoto>) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
     assertEquals(userResponse, fakeList);
@@ -126,11 +128,11 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetVideos() {
-    List<String> fakeList = Lists.newArrayList();
+    List<FacebookVideo> fakeList = Lists.newArrayList();
     when(facebookProvider.getFacebookUserVideos()).thenReturn(fakeList);
 
     Response response = resource.getVideos(key, "Test");
-    List<String> userResponse = (List<String>) response.getEntity();
+    List<FacebookVideo> userResponse = (List<FacebookVideo>) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
     assertEquals(userResponse, fakeList);
