@@ -3,6 +3,7 @@ package com.sanction.lightning.facebook;
 import com.google.common.collect.Lists;
 
 import com.restfb.DefaultFacebookClient;
+import com.restfb.DefaultJsonMapper;
 import com.restfb.FacebookClient.AccessToken;
 import com.restfb.Parameter;
 import com.restfb.Version;
@@ -12,6 +13,7 @@ import com.restfb.scope.ScopeBuilder;
 import com.restfb.scope.UserDataPermissions;
 
 import com.sanction.lightning.models.FacebookPhoto;
+import com.sanction.lightning.models.FacebookPhotoDetail;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.lightning.models.FacebookVideo;
 
@@ -69,16 +71,23 @@ public class FacebookProvider {
   public List<FacebookPhoto> getFacebookUserPhotos() {
     // Fetch a json object containing an array of photos, each with specified properties
     JsonObject photos = client.fetchObject("me/photos", JsonObject.class,
-            Parameter.with("type", "uploaded"), Parameter.with("fields", "id, link"));
+            Parameter.with("type", "uploaded"), Parameter.with("fields", "id, images"));
 
     // Fetch the array from JsonObject and make a JsonArray
     JsonArray photosArray = photos.getJsonArray("data");
 
     // Construct a new list of FacebookPhoto objects to return
     List<FacebookPhoto> photoList = Lists.newArrayList();
+
+    // Construct a JsonMapper for json string to FacebookPhotoDetail object conversion
+    DefaultJsonMapper mapper = new DefaultJsonMapper();
     for (int i = 0; i < photosArray.length(); i++) {
       JsonObject obj = photosArray.getJsonObject(i);
-      FacebookPhoto pic = new FacebookPhoto(obj.getString("id"), obj.getString("link"));
+      List<FacebookPhotoDetail> detailList = mapper.toJavaList(obj.getString("images"),
+              FacebookPhotoDetail.class);
+      FacebookPhotoDetail detail = detailList.get(0);
+      FacebookPhoto pic = new FacebookPhoto(obj.getString("id"), detail.getUri(),
+              detail.getHeight(), detail.getWidth());
       photoList.add(pic);
     }
 
