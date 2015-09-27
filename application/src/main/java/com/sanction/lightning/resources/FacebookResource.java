@@ -7,10 +7,12 @@ import com.sanction.lightning.facebook.FacebookProviderFactory;
 import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.lightning.models.FacebookVideo;
+import com.sanction.lightning.utils.UrlDownloadService;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
 
+import java.net.URLConnection;
 import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -30,12 +32,21 @@ public class FacebookResource {
 
   private final ThunderClient thunderClient;
   private final FacebookProviderFactory facebookProviderFactory;
+  private final UrlDownloadService urlDownloadService;
 
+  /**
+   * Constructs a FacebookResource for registering endpoints with Jersey.
+   * @param thunderClient client for connecting to thunder.
+   * @param facebookProviderFactory provider factory for facebook api calls.
+   * @param urlDownloadService helper class for http requests.
+   */
   @Inject
   public FacebookResource(ThunderClient thunderClient,
-                          FacebookProviderFactory facebookProviderFactory) {
+                          FacebookProviderFactory facebookProviderFactory,
+                          UrlDownloadService urlDownloadService) {
     this.thunderClient = thunderClient;
     this.facebookProviderFactory = facebookProviderFactory;
+    this.urlDownloadService = urlDownloadService;
   }
 
   /**
@@ -81,7 +92,7 @@ public class FacebookResource {
   public Response getPhotos(@Auth Key key, @QueryParam("username") String username) {
     if (username == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-              .entity("'username' query parameter is required for getUser").build();
+              .entity("'username' query parameter is required for getPhotos").build();
     }
 
     PilotUser pilotUser = thunderClient.getUser(username);
@@ -98,6 +109,39 @@ public class FacebookResource {
     }
 
     return Response.ok(photoList).build();
+  }
+
+  /**
+   * Fetches the bytes of a file at the given url.
+   * @param key The authentication key for the requesting application.
+   * @param url the url of the photo to get bytes for.
+   * @return picture represented as a byte array.
+   */
+  @GET
+  @Path("/mediaBytes")
+  public Response getMediaBytes(@Auth Key key, @QueryParam("url") String url) {
+    if (url == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("'url' query parameter is required for getMediaBytes").build();
+    }
+
+    URLConnection connection = urlDownloadService.fetchUrlConnection(url);
+
+    if (connection == null) {
+      LOG.error("Bad URL");
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("Request rejected due to bad URL").build();
+    }
+
+    byte[] response = urlDownloadService.inputStreamToByteArray(connection);
+
+    if (response == null) {
+      LOG.error("Bad InputStream");
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity("Error trying to read bytes").build();
+    }
+
+    return Response.ok(response).build();
   }
 
   /**

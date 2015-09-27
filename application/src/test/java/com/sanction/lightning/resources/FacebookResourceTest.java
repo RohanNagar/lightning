@@ -8,9 +8,11 @@ import com.sanction.lightning.facebook.FacebookProviderFactory;
 import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.lightning.models.FacebookVideo;
+import com.sanction.lightning.utils.UrlDownloadService;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
+import java.net.URLConnection;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -27,11 +29,14 @@ public class FacebookResourceTest {
   private final ThunderClient thunderClient = mock(ThunderClient.class);
   private final FacebookProviderFactory providerFactory = mock(FacebookProviderFactory.class);
   private final FacebookProvider facebookProvider = mock(FacebookProvider.class);
+  private final UrlDownloadService urlDownloadService = mock(UrlDownloadService.class);
+  private final URLConnection urlConnection = mock(URLConnection.class);
 
   private final PilotUser pilotUser = mock(PilotUser.class);
   private final Key key = mock(Key.class);
 
-  private final FacebookResource resource = new FacebookResource(thunderClient, providerFactory);
+  private final FacebookResource resource = new FacebookResource(thunderClient, providerFactory,
+          urlDownloadService);
 
   @Before
   public void setup() {
@@ -105,6 +110,43 @@ public class FacebookResourceTest {
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
     assertEquals(userResponse, fakeList);
+  }
+
+  @Test
+  public void testGetMediaBytesWithNullUrl() {
+    Response response = resource.getMediaBytes(key, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetMediaByesWithBadUrl() {
+    when(urlDownloadService.fetchUrlConnection(any(String.class))).thenReturn(null);
+    Response response = resource.getMediaBytes(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetMediaBytesWithBadConnection() {
+    when(urlDownloadService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
+    when(urlDownloadService.inputStreamToByteArray(any(URLConnection.class))).thenReturn(null);
+    Response response = resource.getMediaBytes(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testGetMediaBytes() {
+    byte[] testBytes = {};
+    when(urlDownloadService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
+    when(urlDownloadService.inputStreamToByteArray(any(URLConnection.class))).thenReturn(testBytes);
+
+    Response response = resource.getMediaBytes(key, "Test");
+    byte[] userResponse = (byte[]) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(userResponse, testBytes);
   }
 
   /* Video Tests */
