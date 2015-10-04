@@ -1,13 +1,21 @@
 package com.sanction.lightning.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.restfb.Facebook;
 
 public class FacebookPhoto {
 
-  private final String id;
-  private final String uri;
-  private final String height;
-  private final String width;
+  @Facebook
+  private String id;
+
+  @Facebook
+  private String uri;
+
+  @Facebook
+  private String height;
+
+  @Facebook
+  private String width;
 
   /**
    * Constructs a new FacebookPhoto representing a facebook user photo.
@@ -21,6 +29,10 @@ public class FacebookPhoto {
     this.uri = uri;
     this.height = height;
     this.width = width;
+  }
+
+  public FacebookPhoto() {
+
   }
 
   @JsonProperty

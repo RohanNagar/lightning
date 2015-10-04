@@ -7,9 +7,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class UrlDownloadService {
+public class UrlService {
 
-  public UrlDownloadService() {
+  public UrlService() {
 
   }
 
@@ -30,17 +30,34 @@ public class UrlDownloadService {
   }
 
   /**
-   * Constructs a new byte array from the resource at a given URLConnection.
-   * @param connection the supplied URLConnection
+   * Fetch an InputStream from a given URLConnection.
+   * @param connection The supplied URLConnection.
+   * @return InputStream of the URLConnection.
+   */
+  public InputStream fetchInputStreamFromConnection(URLConnection connection) {
+    InputStream inputStream;
+
+    try {
+      inputStream = connection.getInputStream();
+    } catch (IOException e) {
+      return null;
+    }
+
+    return inputStream;
+  }
+
+  /**
+   * Constructs a byte array from the given InputStream.
+   * @param inputStream the supplied URLConnection
    * @return a byte array
    */
-  public byte[] inputStreamToByteArray(URLConnection connection) {
+  public byte[] inputStreamToByteArray(InputStream inputStream) {
     byte[] response;
 
-    try (InputStream in = new BufferedInputStream(connection.getInputStream());
+    try (InputStream in = new BufferedInputStream(inputStream);
         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
-      // Construct a byte array from an InputStream
+      // Construct a byte array from the InputStream
       byte[] buf = new byte[1024];
       int n;
       while (-1 != (n = in.read(buf))) {

@@ -3,19 +3,21 @@ package com.sanction.lightning.resources;
 import com.google.common.collect.Lists;
 import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
-import com.sanction.lightning.facebook.FacebookProvider;
-import com.sanction.lightning.facebook.FacebookProviderFactory;
+import com.sanction.lightning.facebook.FacebookService;
+import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.lightning.models.FacebookVideo;
-import com.sanction.lightning.utils.UrlDownloadService;
+import com.sanction.lightning.utils.UrlService;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
+import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,22 +29,25 @@ import static org.mockito.Mockito.when;
 
 public class FacebookResourceTest {
   private final ThunderClient thunderClient = mock(ThunderClient.class);
-  private final FacebookProviderFactory providerFactory = mock(FacebookProviderFactory.class);
-  private final FacebookProvider facebookProvider = mock(FacebookProvider.class);
-  private final UrlDownloadService urlDownloadService = mock(UrlDownloadService.class);
+  private final FacebookServiceFactory serviceFactory = mock(FacebookServiceFactory.class);
+  private final FacebookService facebookService = mock(FacebookService.class);
+  private final UrlService urlService = mock(UrlService.class);
   private final URLConnection urlConnection = mock(URLConnection.class);
+  private final InputStream inputStream = mock(InputStream.class);
+  private final FormDataContentDisposition contentDisposition =
+          mock(FormDataContentDisposition.class);
 
   private final PilotUser pilotUser = mock(PilotUser.class);
   private final Key key = mock(Key.class);
 
-  private final FacebookResource resource = new FacebookResource(thunderClient, providerFactory,
-          urlDownloadService);
+  private final FacebookResource resource = new FacebookResource(thunderClient, serviceFactory,
+          urlService);
 
   @Before
   public void setup() {
-    // Setup ProviderFactory
-    when(providerFactory.newFacebookProvider(anyString())).thenReturn(facebookProvider);
-    when(providerFactory.newFacebookProvider()).thenReturn(facebookProvider);
+    // Setup ServiceFactory
+    when(serviceFactory.newFacebookService(anyString())).thenReturn(facebookService);
+    when(serviceFactory.newFacebookService()).thenReturn(facebookService);
 
     // Setup ThunderClient
     when(thunderClient.getUser(anyString())).thenReturn(pilotUser);
@@ -62,7 +67,7 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetUserWithExpiredOAuth() {
-    when(facebookProvider.getFacebookUser()).thenThrow(FacebookOAuthException.class);
+    when(facebookService.getFacebookUser()).thenThrow(FacebookOAuthException.class);
 
     Response response = resource.getUser(key, "Test");
 
@@ -72,7 +77,7 @@ public class FacebookResourceTest {
   @Test
   public void testGetUser() {
     FacebookUser facebookUser = mock(FacebookUser.class);
-    when(facebookProvider.getFacebookUser()).thenReturn(facebookUser);
+    when(facebookService.getFacebookUser()).thenReturn(facebookUser);
 
     Response response = resource.getUser(key, "Test");
     FacebookUser userResponse = (FacebookUser) response.getEntity();
@@ -92,7 +97,7 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetPhotosWithOauthException() {
-    when(facebookProvider.getFacebookUserPhotos()).thenThrow(FacebookOAuthException.class);
+    when(facebookService.getFacebookUserPhotos()).thenThrow(FacebookOAuthException.class);
 
     Response response = resource.getPhotos(key, "Test");
 
@@ -103,7 +108,7 @@ public class FacebookResourceTest {
   @SuppressWarnings("unchecked")
   public void testGetPhotos() {
     List<FacebookPhoto> fakeList = Lists.newArrayList();
-    when(facebookProvider.getFacebookUserPhotos()).thenReturn(fakeList);
+    when(facebookService.getFacebookUserPhotos()).thenReturn(fakeList);
 
     Response response = resource.getPhotos(key, "Test");
     List<FacebookPhoto> userResponse = (List<FacebookPhoto>) response.getEntity();
@@ -112,6 +117,7 @@ public class FacebookResourceTest {
     assertEquals(userResponse, fakeList);
   }
 
+  /* Media Bytes Tests */
   @Test
   public void testGetMediaBytesWithNullUrl() {
     Response response = resource.getMediaBytes(key, null);
@@ -120,17 +126,30 @@ public class FacebookResourceTest {
   }
 
   @Test
-  public void testGetMediaByesWithBadUrl() {
-    when(urlDownloadService.fetchUrlConnection(any(String.class))).thenReturn(null);
+  @SuppressWarnings("unchecked")
+  public void testGetMediaByesWithNullUrlConnection() {
+    when(urlService.fetchUrlConnection(any(String.class))).thenReturn(null);
     Response response = resource.getMediaBytes(key, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
-  public void testGetMediaBytesWithBadConnection() {
-    when(urlDownloadService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
-    when(urlDownloadService.inputStreamToByteArray(any(URLConnection.class))).thenReturn(null);
+  public void testGetMediaBytesWithNullInputStream() {
+    when(urlService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
+    when(urlService.fetchInputStreamFromConnection(urlConnection)).thenReturn(null);
+
+    Response response = resource.getMediaBytes(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testGetMediaBytesWithNullByteArray() {
+    when(urlService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
+    when(urlService.fetchInputStreamFromConnection(urlConnection)).thenReturn(inputStream);
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(null);
+
     Response response = resource.getMediaBytes(key, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
@@ -138,15 +157,78 @@ public class FacebookResourceTest {
 
   @Test
   public void testGetMediaBytes() {
-    byte[] testBytes = {};
-    when(urlDownloadService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
-    when(urlDownloadService.inputStreamToByteArray(any(URLConnection.class))).thenReturn(testBytes);
+    byte[] testBytes =  {};
+    when(urlService.fetchUrlConnection(any(String.class))).thenReturn(urlConnection);
+    when(urlService.fetchInputStreamFromConnection(urlConnection)).thenReturn(inputStream);
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
 
     Response response = resource.getMediaBytes(key, "Test");
     byte[] userResponse = (byte[]) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
     assertEquals(userResponse, testBytes);
+  }
+
+  /* Publish Tests */
+  @Test
+  public void testPublishWithNullUsername() {
+    Response response = resource.publish(key, null, null, null, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWIthNullInputStream() {
+    Response response = resource.publish(key, "Test", null, null, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullBytes() {
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(null);
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testPublishWithNullFacebookResponse() {
+    byte[] testBytes =  {};
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
+    when(facebookService.publishToFacebook(any(byte[].class),
+            any(String.class), any(String.class))).thenReturn(null);
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testPublishWithNullMessage() {
+    byte[] testBytes =  {};
+    FacebookPhoto facebookPhoto = mock(FacebookPhoto.class);
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
+    when(facebookService.publishToFacebook(any(byte[].class),
+            any(String.class), any(String.class))).thenReturn(facebookPhoto);
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, null);
+    FacebookPhoto result = (FacebookPhoto) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(result, facebookPhoto);
+  }
+
+  @Test
+  public void testPublish() {
+    byte[] testBytes =  {};
+    FacebookPhoto facebookPhoto = mock(FacebookPhoto.class);
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
+    when(facebookService.publishToFacebook(any(byte[].class),
+            any(String.class), any(String.class))).thenReturn(facebookPhoto);
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "Test");
+    FacebookPhoto result = (FacebookPhoto) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(result, facebookPhoto);
   }
 
   /* Video Tests */
@@ -160,7 +242,7 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetVideosWithOauthException() {
-    when(facebookProvider.getFacebookUserVideos()).thenThrow(FacebookOAuthException.class);
+    when(facebookService.getFacebookUserVideos()).thenThrow(FacebookOAuthException.class);
 
     Response response = resource.getVideos(key, "Test");
 
@@ -171,7 +253,7 @@ public class FacebookResourceTest {
   @SuppressWarnings("unchecked")
   public void testGetVideos() {
     List<FacebookVideo> fakeList = Lists.newArrayList();
-    when(facebookProvider.getFacebookUserVideos()).thenReturn(fakeList);
+    when(facebookService.getFacebookUserVideos()).thenReturn(fakeList);
 
     Response response = resource.getVideos(key, "Test");
     List<FacebookVideo> userResponse = (List<FacebookVideo>) response.getEntity();
@@ -184,7 +266,7 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetOauthUrlWithOauthException() {
-    when(facebookProvider.getOauthUrl()).thenThrow(FacebookOAuthException.class);
+    when(facebookService.getOauthUrl()).thenThrow(FacebookOAuthException.class);
 
     Response response = resource.getOauthUrl(key);
 
@@ -193,7 +275,7 @@ public class FacebookResourceTest {
 
   @Test
   public void testGetOauthUrl() {
-    when(facebookProvider.getOauthUrl()).thenReturn("Test");
+    when(facebookService.getOauthUrl()).thenReturn("Test");
 
     Response response = resource.getOauthUrl(key);
     String string = (String) response.getEntity();
@@ -213,7 +295,7 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetExtendedTokenWithOauthException() {
-    when(facebookProvider.getFacebookExtendedToken()).thenThrow(FacebookOAuthException.class);
+    when(facebookService.getFacebookExtendedToken()).thenThrow(FacebookOAuthException.class);
 
     Response response = resource.getExtendedToken(key, "Test");
 
@@ -223,7 +305,7 @@ public class FacebookResourceTest {
   @Test
   public void testGetExtendedTokenWithFailedUpdate() {
     String testToken = "Test";
-    when(facebookProvider.getFacebookExtendedToken()).thenReturn(testToken);
+    when(facebookService.getFacebookExtendedToken()).thenReturn(testToken);
     when(thunderClient.postUser(any(PilotUser.class))).thenReturn(null);
 
     Response response = resource.getExtendedToken(key, "Test");
@@ -234,7 +316,7 @@ public class FacebookResourceTest {
   @Test
   public void testGetExtendedToken() {
     String testToken = "Test";
-    when(facebookProvider.getFacebookExtendedToken()).thenReturn(testToken);
+    when(facebookService.getFacebookExtendedToken()).thenReturn(testToken);
     when(thunderClient.updateUser(any(PilotUser.class))).thenReturn(pilotUser);
 
     Response response = resource.getExtendedToken(key, "Test");
