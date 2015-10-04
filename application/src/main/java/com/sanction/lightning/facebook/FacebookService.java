@@ -2,13 +2,16 @@ package com.sanction.lightning.facebook;
 
 import com.google.common.collect.Lists;
 
+import com.restfb.BinaryAttachment;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.DefaultJsonMapper;
 import com.restfb.FacebookClient.AccessToken;
 import com.restfb.Parameter;
 import com.restfb.Version;
+import com.restfb.exception.FacebookException;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
+import com.restfb.scope.ExtendedPermissions;
 import com.restfb.scope.ScopeBuilder;
 import com.restfb.scope.UserDataPermissions;
 
@@ -19,22 +22,22 @@ import com.sanction.lightning.models.FacebookVideo;
 
 import java.util.List;
 
-public class FacebookProvider {
-  private static final String REDIRECT_URL = "example.com";
+public class FacebookService {
+  private static final String REDIRECT_URL = "http://example.com";
 
   private final DefaultFacebookClient client;
   private final String appId;
   private final String appSecret;
 
   /**
-   * Constructs a new FacebookProvider for making requests to Facebook.
+   * Constructs a new FacebookService for making requests to Facebook.
    *
    * @param facebookAccessToken The access token for the user.
-   * @param facebookApplicationId The facebook application id
+   * @param facebookApplicationId The facebook application id.
    * @param facebookApplicationSecret The authenticating application secret.
    */
-  public FacebookProvider(String facebookAccessToken, String facebookApplicationId,
-                          String facebookApplicationSecret) {
+  public FacebookService(String facebookAccessToken, String facebookApplicationId,
+                         String facebookApplicationSecret) {
     this.client = new DefaultFacebookClient(facebookAccessToken, facebookApplicationSecret,
         Version.VERSION_2_4);
     this.appId = facebookApplicationId;
@@ -42,12 +45,12 @@ public class FacebookProvider {
   }
 
   /**
-   * Constructs a new FacebookProvider for making requests to Facebook.
+   * Constructs a new FacebookService for making requests to Facebook.
    *
    * @param facebookApplicationId The Facebook consumer application id.
    * @param facebookApplicationSecret The Facebook consumer application secret.
    */
-  public FacebookProvider(String facebookApplicationId, String facebookApplicationSecret) {
+  public FacebookService(String facebookApplicationId, String facebookApplicationSecret) {
     this.client = new DefaultFacebookClient(Version.VERSION_2_4);
     this.appId = facebookApplicationId;
     this.appSecret = facebookApplicationSecret;
@@ -95,6 +98,24 @@ public class FacebookProvider {
   }
 
   /**
+   * Published a file to facebook using the restFB api.
+   *
+   * @return A boolean to denote that the function worked.
+   */
+  public FacebookPhoto publishToFacebook(byte[] inputBytes, String fileName, String message) {
+    FacebookPhoto response;
+
+    try {
+      response = client.publish("me/photos", FacebookPhoto.class,
+              BinaryAttachment.with(fileName, inputBytes), Parameter.with("message", message));
+    } catch (FacebookException e) {
+      return null;
+    }
+
+    return response;
+  }
+
+  /**
    * Gets the user's videos from Facebook.
    *
    * @return A list of FacebookVideo objects representing the users videos.
@@ -124,6 +145,8 @@ public class FacebookProvider {
     scopeBuilder.addPermission(UserDataPermissions.USER_PHOTOS);
     scopeBuilder.addPermission(UserDataPermissions.USER_VIDEOS);
     scopeBuilder.addPermission(UserDataPermissions.USER_POSTS);
+    scopeBuilder.addPermission(UserDataPermissions.USER_ACTIONS_VIDEO);
+    scopeBuilder.addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
     return client.getLoginDialogUrl(appId, REDIRECT_URL, scopeBuilder);
   }

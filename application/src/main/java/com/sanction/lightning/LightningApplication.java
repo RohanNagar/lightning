@@ -9,6 +9,7 @@ import com.sanction.thunder.ThunderClient;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthFactory;
 import io.dropwizard.auth.basic.BasicAuthFactory;
+import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -20,7 +21,7 @@ public class LightningApplication extends Application<LightningConfiguration> {
 
   @Override
   public void initialize(Bootstrap<LightningConfiguration> bootstrap) {
-
+    bootstrap.addBundle(new MultiPartBundle());
   }
 
   @Override

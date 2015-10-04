@@ -2,26 +2,33 @@ package com.sanction.lightning.resources;
 
 import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
-import com.sanction.lightning.facebook.FacebookProvider;
-import com.sanction.lightning.facebook.FacebookProviderFactory;
+import com.sanction.lightning.facebook.FacebookService;
+import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.lightning.models.FacebookVideo;
-import com.sanction.lightning.utils.UrlDownloadService;
+import com.sanction.lightning.utils.UrlService;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
 
+import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.List;
 import javax.inject.Inject;
+
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,27 +38,26 @@ public class FacebookResource {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookResource.class);
 
   private final ThunderClient thunderClient;
-  private final FacebookProviderFactory facebookProviderFactory;
-  private final UrlDownloadService urlDownloadService;
+  private final FacebookServiceFactory facebookServiceFactory;
+  private final UrlService urlService;
 
   /**
    * Constructs a FacebookResource for registering endpoints with Jersey.
    * @param thunderClient client for connecting to thunder.
-   * @param facebookProviderFactory provider factory for facebook api calls.
-   * @param urlDownloadService helper class for http requests.
+   * @param facebookServiceFactory service factory for facebook api calls.
+   * @param urlService helper class for http requests.
    */
   @Inject
   public FacebookResource(ThunderClient thunderClient,
-                          FacebookProviderFactory facebookProviderFactory,
-                          UrlDownloadService urlDownloadService) {
+                          FacebookServiceFactory facebookServiceFactory,
+                          UrlService urlService) {
     this.thunderClient = thunderClient;
-    this.facebookProviderFactory = facebookProviderFactory;
-    this.urlDownloadService = urlDownloadService;
+    this.facebookServiceFactory = facebookServiceFactory;
+    this.urlService = urlService;
   }
 
   /**
    * Fetches a FacebookUser object containing user information.
-   *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get FacebookUser information for.
    * @return The FacebookUser object corresponding to the Pilot username.
@@ -65,12 +71,12 @@ public class FacebookResource {
     }
 
     PilotUser pilotUser = thunderClient.getUser(username);
-    FacebookProvider facebookProvider
-        = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService
+        = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
     FacebookUser facebookUser;
     try {
-      facebookUser = facebookProvider.getFacebookUser();
+      facebookUser = facebookService.getFacebookUser();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token for username {}", username, e);
       return Response.status(Response.Status.NOT_FOUND)
@@ -82,7 +88,6 @@ public class FacebookResource {
 
   /**
    * Fetches all the photos of a specific user.
-   *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get photos for.
    * @return A list of the photos uploaded by the user.
@@ -96,12 +101,12 @@ public class FacebookResource {
     }
 
     PilotUser pilotUser = thunderClient.getUser(username);
-    FacebookProvider facebookProvider
-            = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService
+            = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
     List<FacebookPhoto> photoList;
     try {
-      photoList = facebookProvider.getFacebookUserPhotos();
+      photoList = facebookService.getFacebookUserPhotos();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token for username {}", username, e);
       return Response.status(Response.Status.NOT_FOUND)
@@ -109,6 +114,59 @@ public class FacebookResource {
     }
 
     return Response.ok(photoList).build();
+  }
+
+  /**
+   * Publishes to a users facebook timeline.
+   * @param key The authentication key for the requesting application.
+   * @return The uploaded photo information if the request was successful.
+   */
+  @POST
+  @Path("/publish")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  public Response publish(@Auth Key key, @QueryParam("username") String username,
+                               @FormDataParam("file") InputStream inputStream,
+                               @FormDataParam("file") FormDataContentDisposition
+                                         contentDispositionHeader,
+                               String message) {
+    if (username == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("'username' query parameter is required for publish").build();
+    }
+
+    if (message == null) {
+      // In this case, the caller did not specify a message, so we post with an empty String.
+      message = "";
+    }
+
+    if (inputStream == null) {
+      LOG.error("Bad InputStream");
+      return Response.status(Response.Status.BAD_REQUEST)
+              .entity("Error trying to read InputStream").build();
+    }
+
+    PilotUser pilotUser = thunderClient.getUser(username);
+    FacebookService facebookService
+            = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+
+    byte[] uploadBytes = urlService.inputStreamToByteArray(inputStream);
+
+    if (uploadBytes == null) {
+      LOG.error("Error reading bytes");
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity("Error trying to read bytes").build();
+    }
+
+    FacebookPhoto uploaded = facebookService.publishToFacebook(uploadBytes,
+            contentDispositionHeader.getFileName(), message);
+
+    if (uploaded == null) {
+      LOG.error("Error uploading facebook photo");
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity("Error uploading to facebook").build();
+    }
+
+    return Response.ok(uploaded).build();
   }
 
   /**
@@ -125,7 +183,7 @@ public class FacebookResource {
               .entity("'url' query parameter is required for getMediaBytes").build();
     }
 
-    URLConnection connection = urlDownloadService.fetchUrlConnection(url);
+    URLConnection connection = urlService.fetchUrlConnection(url);
 
     if (connection == null) {
       LOG.error("Bad URL");
@@ -133,10 +191,18 @@ public class FacebookResource {
               .entity("Request rejected due to bad URL").build();
     }
 
-    byte[] response = urlDownloadService.inputStreamToByteArray(connection);
+    InputStream connectionInputStream = urlService.fetchInputStreamFromConnection(connection);
+
+    if (connectionInputStream == null) {
+      LOG.error("Bad InputStream");
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity("Error reading InputStream").build();
+    }
+
+    byte[] response = urlService.inputStreamToByteArray(connectionInputStream);
 
     if (response == null) {
-      LOG.error("Bad InputStream");
+      LOG.error("Error reading bytes");
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
               .entity("Error trying to read bytes").build();
     }
@@ -146,7 +212,6 @@ public class FacebookResource {
 
   /**
    * Fetches all the videos of a specific user.
-   *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get videos for.
    * @return A list of the videos uploaded by the user.
@@ -160,12 +225,12 @@ public class FacebookResource {
     }
 
     PilotUser pilotUser = thunderClient.getUser(username);
-    FacebookProvider facebookProvider
-            = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService
+            = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
     List<FacebookVideo> videoList;
     try {
-      videoList = facebookProvider.getFacebookUserVideos();
+      videoList = facebookService.getFacebookUserVideos();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token for username {}", username, e);
       return Response.status(Response.Status.NOT_FOUND)
@@ -177,7 +242,6 @@ public class FacebookResource {
 
   /**
    * Fetches a an extended token given an existing token.
-   *
    * @param key The authentication key for the requesting application.
    * @param username The name of the PilotUser to fetch an extended token for.
    * @return An extended Facebook user token.
@@ -191,12 +255,12 @@ public class FacebookResource {
     }
 
     PilotUser pilotUser = thunderClient.getUser(username);
-    FacebookProvider facebookProvider
-            = facebookProviderFactory.newFacebookProvider(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService
+            = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
     String extendedToken;
     try {
-      extendedToken = facebookProvider.getFacebookExtendedToken();
+      extendedToken = facebookService.getFacebookExtendedToken();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth Token", e);
       return Response.status(Response.Status.NOT_FOUND)
@@ -217,19 +281,18 @@ public class FacebookResource {
 
   /**
    * Fetches the loginDialogUrl for setting user permissions with Facebook.
-   *
    * @param key The authentication key for the requesting application.
    * @return The url string used to set permissions.
    */
   @GET
   @Path("/oauthUrl")
   public Response getOauthUrl(@Auth Key key) {
-    FacebookProvider facebookProvider
-            = facebookProviderFactory.newFacebookProvider();
+    FacebookService facebookService
+            = facebookServiceFactory.newFacebookService();
 
     String permissionsUrl;
     try {
-      permissionsUrl = facebookProvider.getOauthUrl();
+      permissionsUrl = facebookService.getOauthUrl();
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token for username", e);
       return Response.status(Response.Status.NOT_FOUND)
