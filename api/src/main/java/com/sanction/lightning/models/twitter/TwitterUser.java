@@ -1,4 +1,4 @@
-package com.sanction.lightning.models;
+package com.sanction.lightning.models.twitter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

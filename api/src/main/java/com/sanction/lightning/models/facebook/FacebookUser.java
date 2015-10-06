@@ -1,4 +1,4 @@
-package com.sanction.lightning.models;
+package com.sanction.lightning.models.facebook;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;

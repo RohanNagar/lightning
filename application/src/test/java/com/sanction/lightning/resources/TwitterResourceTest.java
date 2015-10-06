@@ -1,7 +1,7 @@
 package com.sanction.lightning.resources;
 
 import com.sanction.lightning.authentication.Key;
-import com.sanction.lightning.models.TwitterUser;
+import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
 import com.sanction.thunder.ThunderClient;

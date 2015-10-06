@@ -1,6 +1,6 @@
 package com.sanction.lightning.twitter;
 
-import com.sanction.lightning.models.TwitterUser;
+import com.sanction.lightning.models.twitter.TwitterUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.Twitter;
