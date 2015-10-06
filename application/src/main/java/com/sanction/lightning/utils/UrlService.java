@@ -14,12 +14,14 @@ public class UrlService {
   }
 
   /**
-   * Construct a new URLConnection for connecting to a provided URL.
-   * @param url a supplied url
-   * @return a URLConnection
+   * Constructs a new URLConnection for connecting to a provided URL.
+   *
+   * @param url The URL to open the connection to.
+   * @return The URLConnection that was opened or {@code null} if an error occurred.
    */
   public URLConnection fetchUrlConnection(String url) {
     URLConnection connection;
+
     try {
       connection = new URL(url).openConnection();
     } catch (IOException e) {
@@ -30,9 +32,10 @@ public class UrlService {
   }
 
   /**
-   * Fetch an InputStream from a given URLConnection.
+   * Fetches an InputStream from a given URLConnection.
+   *
    * @param connection The supplied URLConnection.
-   * @return InputStream of the URLConnection.
+   * @return The InputStream of the URLConnection or {@code null} if an error occurred.
    */
   public InputStream fetchInputStreamFromConnection(URLConnection connection) {
     InputStream inputStream;
@@ -47,15 +50,16 @@ public class UrlService {
   }
 
   /**
-   * Constructs a byte array from the given InputStream.
-   * @param inputStream the supplied URLConnection
-   * @return a byte array
+   * Reads bytes from an InputStream into a byte array.
+   *
+   * @param inputStream The InputStream to read from.
+   * @return A byte array containing the data read from the InputStream or {@code null} upon error.
    */
   public byte[] inputStreamToByteArray(InputStream inputStream) {
     byte[] response;
 
     try (InputStream in = new BufferedInputStream(inputStream);
-        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
       // Construct a byte array from the InputStream
       byte[] buf = new byte[1024];
