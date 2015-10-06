@@ -59,6 +59,7 @@ Simply replace the brackets with the appropriate information and run the command
  * `http -a {application}:{secret} GET localhost:9000/facebook/videos?username={name}`
  * `http -a {application}:{secret} GET localhost:9000/facebook/extendedToken?username={name}`
  * `http -a {application}:{secret} GET localhost:9000/facebook/oauthUrl`
+ * `http -a {application}:{secret} -f POST "localhost:9000/facebook/publish?username={name}&type={type}" file@location/to/file message="Some message" title="Some title"`
 
 * Twitter
  * `http -a {application}:{secret} GET localhost:9000/twitter/users?username={name}`

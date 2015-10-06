@@ -19,11 +19,13 @@ import com.sanction.lightning.models.FacebookPhoto;
 import com.sanction.lightning.models.FacebookPhotoDetail;
 import com.sanction.lightning.models.FacebookUser;
 import com.sanction.lightning.models.FacebookVideo;
+import com.sanction.lightning.utils.CustomWebRequester;
 
 import java.util.List;
 
 public class FacebookService {
   private static final String REDIRECT_URL = "http://example.com";
+  private static final Version VERSION = Version.VERSION_2_4;
 
   private final DefaultFacebookClient client;
   private final String appId;
@@ -39,7 +41,7 @@ public class FacebookService {
   public FacebookService(String facebookAccessToken, String facebookApplicationId,
                          String facebookApplicationSecret) {
     this.client = new DefaultFacebookClient(facebookAccessToken, facebookApplicationSecret,
-        Version.VERSION_2_4);
+            new CustomWebRequester(), new DefaultJsonMapper(), VERSION);
     this.appId = facebookApplicationId;
     this.appSecret = facebookApplicationSecret;
   }
@@ -51,7 +53,7 @@ public class FacebookService {
    * @param facebookApplicationSecret The Facebook consumer application secret.
    */
   public FacebookService(String facebookApplicationId, String facebookApplicationSecret) {
-    this.client = new DefaultFacebookClient(Version.VERSION_2_4);
+    this.client = new DefaultFacebookClient(VERSION);
     this.appId = facebookApplicationId;
     this.appSecret = facebookApplicationSecret;
   }
@@ -100,19 +102,29 @@ public class FacebookService {
   /**
    * Published a file to facebook using the restFB api.
    *
-   * @return A boolean to denote that the function worked.
+   * @return A json String with returned file information denoting the call to Facebook worked.
    */
-  public FacebookPhoto publishToFacebook(byte[] inputBytes, String fileName, String message) {
-    FacebookPhoto response;
+  public String publishToFacebook(byte[] inputBytes, String type, String fileName,
+                                  String message, String videoTitle) {
+    List<Parameter> parameters = Lists.newArrayList();
+
+    if (type.equals("photo")) {
+      parameters.add(Parameter.with("message", message));
+    } else {
+      parameters.add(Parameter.with("description", message));
+      parameters.add(Parameter.with("title", videoTitle));
+    }
+
+    JsonObject response;
 
     try {
-      response = client.publish("me/photos", FacebookPhoto.class,
-              BinaryAttachment.with(fileName, inputBytes), Parameter.with("message", message));
+      response = client.publish("me/" + type + "s", JsonObject.class,
+              BinaryAttachment.with(fileName, inputBytes),
+              parameters.toArray(new Parameter[parameters.size()]));
     } catch (FacebookException e) {
       return null;
     }
-
-    return response;
+    return response.toString();
   }
 
   /**
