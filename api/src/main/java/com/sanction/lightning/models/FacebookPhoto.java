@@ -8,8 +8,8 @@ public class FacebookPhoto {
   @Facebook
   private String id;
 
-  @Facebook
-  private String uri;
+  @Facebook("uri")
+  private String url;
 
   @Facebook
   private String height;
@@ -20,13 +20,13 @@ public class FacebookPhoto {
   /**
    * Constructs a new FacebookPhoto representing a facebook user photo.
    * @param id the photo id from facebook
-   * @param uri uri of the facebook photo
+   * @param url uri of the facebook photo
    * @param height height in pixels of the photo
    * @param width width in pixels of the photo
    */
-  public FacebookPhoto(String id, String uri, String height, String width) {
+  public FacebookPhoto(String id, String url, String height, String width) {
     this.id = id;
-    this.uri = uri;
+    this.url = url;
     this.height = height;
     this.width = width;
   }
@@ -41,8 +41,8 @@ public class FacebookPhoto {
   }
 
   @JsonProperty
-  public String getUri() {
-    return uri;
+  public String getUrl() {
+    return url;
   }
 
   @JsonProperty

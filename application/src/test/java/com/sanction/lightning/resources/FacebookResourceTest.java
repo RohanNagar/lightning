@@ -172,14 +172,28 @@ public class FacebookResourceTest {
   /* Publish Tests */
   @Test
   public void testPublishWithNullUsername() {
-    Response response = resource.publish(key, null, null, null, null);
+    Response response = resource.publish(key, null, null, null, null, null, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullType() {
+    Response response = resource.publish(key, "Test", null, null, null, null, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithBadTypeValue() {
+    Response response = resource.publish(key, "Test", null, null, "Test", null, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWIthNullInputStream() {
-    Response response = resource.publish(key, "Test", null, null, "Test");
+    Response response = resource.publish(key, "Test", null, null, "photo", null, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -187,7 +201,8 @@ public class FacebookResourceTest {
   @Test
   public void testPublishWithNullBytes() {
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(null);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "Test");
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
+            "Test", "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -197,38 +212,57 @@ public class FacebookResourceTest {
     byte[] testBytes =  {};
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
     when(facebookService.publishToFacebook(any(byte[].class),
-            any(String.class), any(String.class))).thenReturn(null);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "Test");
+            any(String.class), any(String.class), any(String.class),
+            any(String.class))).thenReturn(null);
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
+            "Test", "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @Test
-  public void testPublishWithNullMessage() {
+  public void testPublishWithNullVideoTitle() {
     byte[] testBytes =  {};
-    FacebookPhoto facebookPhoto = mock(FacebookPhoto.class);
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
     when(facebookService.publishToFacebook(any(byte[].class),
-            any(String.class), any(String.class))).thenReturn(facebookPhoto);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, null);
-    FacebookPhoto result = (FacebookPhoto) response.getEntity();
+            any(String.class), any(String.class), any(String.class),
+            any(String.class))).thenReturn("Test");
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
+            "Test", null);
+    String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(result, facebookPhoto);
+    assertEquals(result, "Test");
+  }
+
+  @Test
+  public void testPublishWithNullMessage() {
+    byte[] testBytes =  {};
+    when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
+    when(facebookService.publishToFacebook(any(byte[].class),
+            any(String.class), any(String.class), any(String.class),
+            any(String.class))).thenReturn("Test");
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
+            null, "Test");
+    String result = (String) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(result, "Test");
   }
 
   @Test
   public void testPublish() {
     byte[] testBytes =  {};
-    FacebookPhoto facebookPhoto = mock(FacebookPhoto.class);
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
     when(facebookService.publishToFacebook(any(byte[].class),
-            any(String.class), any(String.class))).thenReturn(facebookPhoto);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "Test");
-    FacebookPhoto result = (FacebookPhoto) response.getEntity();
+            any(String.class), any(String.class), any(String.class),
+            any(String.class))).thenReturn("Test");
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition,
+            "photo", "Test", "Test");
+    String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(result, facebookPhoto);
+    assertEquals(result, "Test");
   }
 
   /* Video Tests */
