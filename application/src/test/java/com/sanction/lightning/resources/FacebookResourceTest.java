@@ -211,7 +211,7 @@ public class FacebookResourceTest {
   public void testPublishWithNullFacebookResponse() {
     byte[] testBytes =  {};
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
-    when(facebookService.publishToFacebook(any(byte[].class),
+    when(facebookService.publishToFacebook(any(InputStream.class),
             any(String.class), any(String.class), any(String.class),
             any(String.class))).thenReturn(null);
     Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
@@ -224,7 +224,7 @@ public class FacebookResourceTest {
   public void testPublishWithNullVideoTitle() {
     byte[] testBytes =  {};
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
-    when(facebookService.publishToFacebook(any(byte[].class),
+    when(facebookService.publishToFacebook(any(InputStream.class),
             any(String.class), any(String.class), any(String.class),
             any(String.class))).thenReturn("Test");
     Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
@@ -239,7 +239,7 @@ public class FacebookResourceTest {
   public void testPublishWithNullMessage() {
     byte[] testBytes =  {};
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
-    when(facebookService.publishToFacebook(any(byte[].class),
+    when(facebookService.publishToFacebook(any(InputStream.class),
             any(String.class), any(String.class), any(String.class),
             any(String.class))).thenReturn("Test");
     Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
@@ -254,7 +254,7 @@ public class FacebookResourceTest {
   public void testPublish() {
     byte[] testBytes =  {};
     when(urlService.inputStreamToByteArray(inputStream)).thenReturn(testBytes);
-    when(facebookService.publishToFacebook(any(byte[].class),
+    when(facebookService.publishToFacebook(any(InputStream.class),
             any(String.class), any(String.class), any(String.class),
             any(String.class))).thenReturn("Test");
     Response response = resource.publish(key, "Test", inputStream, contentDisposition,

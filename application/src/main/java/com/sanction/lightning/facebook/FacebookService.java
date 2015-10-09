@@ -20,6 +20,7 @@ import com.sanction.lightning.models.facebook.FacebookPhotoDetail;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class FacebookService {
@@ -63,8 +64,8 @@ public class FacebookService {
    * @return A FacebookUser object containing the user's information.
    */
   public FacebookUser getFacebookUser() {
-    return client.fetchObject("me", FacebookUser.class, Parameter.with("fields",
-            "first_name, last_name, middle_name, gender, name, verified"));
+    return client.fetchObject("me", FacebookUser.class,
+        Parameter.with("fields", "first_name, last_name, middle_name, gender, name, verified"));
   }
 
   /**
@@ -74,25 +75,24 @@ public class FacebookService {
    * @return A list of FacebookPhoto objects representing the user's photos.
    */
   public List<FacebookPhoto> getFacebookUserPhotos() {
-    // Fetch a json object containing an array of photos, each with specified properties
+    // Fetch a JSON object containing an array of photos, each with specified properties
     JsonObject photos = client.fetchObject("me/photos", JsonObject.class,
             Parameter.with("type", "uploaded"), Parameter.with("fields", "id, images"));
 
-    // Fetch the array from JsonObject and make a JsonArray
+    // Fetch the photo array from JsonObject and make a JsonArray
     JsonArray photosArray = photos.getJsonArray("data");
 
-    // Construct a new list of FacebookPhoto objects to return
     List<FacebookPhoto> photoList = Lists.newArrayList();
 
-    // Construct a JsonMapper for json string to FacebookPhotoDetail object conversion
+    // Construct a JsonMapper for JSON string to FacebookPhotoDetail conversion
     DefaultJsonMapper mapper = new DefaultJsonMapper();
     for (int i = 0; i < photosArray.length(); i++) {
       JsonObject obj = photosArray.getJsonObject(i);
       List<FacebookPhotoDetail> detailList = mapper.toJavaList(obj.getString("images"),
-              FacebookPhotoDetail.class);
+          FacebookPhotoDetail.class);
       FacebookPhotoDetail detail = detailList.get(0);
       FacebookPhoto pic = new FacebookPhoto(obj.getString("id"), detail.getUri(),
-              detail.getHeight(), detail.getWidth());
+          detail.getHeight(), detail.getWidth());
       photoList.add(pic);
     }
 
@@ -102,7 +102,7 @@ public class FacebookService {
   /**
    * Publishes a photo or video to Facebook.
    *
-   * @param inputBytes The byte array that contains the bytes to upload to Facebook.
+   * @param inputStream The InputStream of the file to upload to Facebook.
    * @param type The type to upload. Should be either "photo" or "video"
    * @param fileName The name to call the file on Facebook.
    * @param message The caption for the photo or video.
@@ -110,7 +110,7 @@ public class FacebookService {
    *                   Will be ignored when uploading a photo.
    * @return A String of JSON with returned information if successful, or {@code null} on failure.
    */
-  public String publishToFacebook(byte[] inputBytes, String type, String fileName,
+  public String publishToFacebook(InputStream inputStream, String type, String fileName,
                                   String message, String videoTitle) {
     List<Parameter> parameters = Lists.newArrayList();
 
@@ -125,8 +125,8 @@ public class FacebookService {
 
     try {
       response = client.publish("me/" + type + "s", JsonObject.class,
-              BinaryAttachment.with(fileName, inputBytes),
-              parameters.toArray(new Parameter[parameters.size()]));
+          BinaryAttachment.with(fileName, inputStream),
+          parameters.toArray(new Parameter[parameters.size()]));
     } catch (FacebookException e) {
       return null;
     }
@@ -178,8 +178,8 @@ public class FacebookService {
    * @return The extended token.
    */
   public String getFacebookExtendedToken() {
-    AccessToken accessToken = client
-            .obtainExtendedAccessToken(appId, appSecret);
+    AccessToken accessToken = client.obtainExtendedAccessToken(appId, appSecret);
+
     return accessToken.getAccessToken();
   }
 }

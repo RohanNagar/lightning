@@ -17,7 +17,6 @@ import java.net.URLConnection;
 import java.util.List;
 import javax.inject.Inject;
 
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -139,7 +138,7 @@ public class FacebookResource {
   public Response publish(@Auth Key key, @QueryParam("username") String username,
                           @FormDataParam("file") InputStream inputStream,
                           @FormDataParam("file") FormDataContentDisposition
-                                    contentDispositionHeader,
+                                contentDispositionHeader,
                           @QueryParam("type") String type,
                           @FormDataParam("message") @DefaultValue("") String message,
                           @FormDataParam("title") @DefaultValue("") String videoTitle) {
@@ -159,30 +158,22 @@ public class FacebookResource {
     }
 
     if (inputStream == null) {
-      LOG.error("Bad InputStream");
+      LOG.error("InputStream was null.");
       return Response.status(Response.Status.BAD_REQUEST)
-              .entity("Error trying to read InputStream").build();
+              .entity("'file' is required for publish").build();
     }
 
     PilotUser pilotUser = thunderClient.getUser(username);
-    FacebookService facebookService
-            = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService =
+        facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
-    byte[] uploadBytes = urlService.inputStreamToByteArray(inputStream);
-
-    if (uploadBytes == null) {
-      LOG.error("Error reading bytes");
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity("Error trying to read bytes").build();
-    }
-
-    String uploadedFile = facebookService.publishToFacebook(uploadBytes, type,
+    String uploadedFile = facebookService.publishToFacebook(inputStream, type,
             contentDispositionHeader.getFileName(), message, videoTitle);
 
     if (uploadedFile == null) {
-      LOG.error("Error uploading to facebook");
+      LOG.error("Error uploading to Facebook.");
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity("Error uploading to facebook").build();
+              .entity("Error uploading to Facebook.").build();
     }
 
     return Response.ok(uploadedFile).build();
@@ -291,9 +282,9 @@ public class FacebookResource {
               .entity("Request rejected due to bad OAuth token").build();
     }
 
-    //set up the PilotUser with the extended token
+    // Set up the PilotUser with the extended token
     pilotUser = new PilotUser(pilotUser.getUsername(), pilotUser.getPassword(), extendedToken,
-            pilotUser.getTwitterAccessSecret(), pilotUser.getTwitterAccessSecret());
+        pilotUser.getTwitterAccessSecret(), pilotUser.getTwitterAccessSecret());
 
     if (thunderClient.updateUser(pilotUser) == null) {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE)
@@ -313,8 +304,7 @@ public class FacebookResource {
   @GET
   @Path("/oauthUrl")
   public Response getOauthUrl(@Auth Key key) {
-    FacebookService facebookService
-            = facebookServiceFactory.newFacebookService();
+    FacebookService facebookService = facebookServiceFactory.newFacebookService();
 
     String permissionsUrl;
     try {
