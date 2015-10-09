@@ -2,7 +2,7 @@
 thunder:
   endpoint: http://localhost:8080
   user-key: lightning
-  user-secret: secret
+  user-secret: 12345
 
 # Approved Authentication Credentials
 approved-keys:
@@ -13,12 +13,12 @@ approved-keys:
 
 # Application Auth Keys
 facebook:
-  app-id:
-  app-secret:
+  app-id: 896501930437172
+  app-secret: 303d6076cc840d8e7bc5d36b2cb9fbc6
 
 twitter:
-  app-key:
-  app-secret:
+  app-key: FYd4qK3yLdGs6BQ4BaaqfkDSJ
+  app-secret: aS2zYpyH9ddtyt5UHoCnu125wFPEY3maLvNKg4dsHWTEqomeRn
 
 # Server Configuration
 server:

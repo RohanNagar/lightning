@@ -18,11 +18,12 @@ public class FacebookPhoto {
   private String width;
 
   /**
-   * Constructs a new FacebookPhoto representing a facebook user photo.
-   * @param id the photo id from facebook
-   * @param url uri of the facebook photo
-   * @param height height in pixels of the photo
-   * @param width width in pixels of the photo
+   * Constructs a new FacebookPhoto object with the specified parameters.
+   *
+   * @param id The Facebook photo ID.
+   * @param url The URL to access the photo on Facebook.
+   * @param height Height in pixels of the photo.
+   * @param width Width in pixels of the photo.
    */
   public FacebookPhoto(String id, String url, String height, String width) {
     this.id = id;

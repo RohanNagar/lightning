@@ -43,11 +43,11 @@ public class FacebookResource {
   private final UrlService urlService;
 
   /**
-   * Constructs a FacebookResource for registering endpoints with Jersey.
+   * Constructs a new FacebookResource to handle Facebook HTTP requests.
    *
-   * @param thunderClient client for connecting to thunder.
-   * @param facebookServiceFactory service factory for facebook api calls.
-   * @param urlService helper class for http requests.
+   * @param thunderClient Client for connecting to Thunder.
+   * @param facebookServiceFactory A factory to create new instances of FacebookService.
+   * @param urlService A helper class for HTTP requests.
    */
   @Inject
   public FacebookResource(ThunderClient thunderClient,
@@ -59,11 +59,11 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches a FacebookUser object containing user information.
+   * Retrieves a FacebookUser object for the requested PilotUser username.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The username of the PilotUser to get FacebookUser information for.
-   * @return The FacebookUser object corresponding to the Pilot username.
+   * @param username The username of the PilotUser to get information for.
+   * @return The FacebookUser object corresponding to the PilotUser username.
    */
   @GET
   @Path("/users")
@@ -90,11 +90,13 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches all the photos of a specific user.
+   * Fetches all the photos for the requested PilotUser username.
+   * This method does not download the actual bytes of the photos.
+   * To download the bytes, use the method {@link #getMediaBytes(Key, String) getMediaBytes}
    *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get photos for.
-   * @return A list of the photos uploaded by the user.
+   * @return A list of the photos that the user has on Facebook.
    */
   @GET
   @Path("/photos")
@@ -121,14 +123,14 @@ public class FacebookResource {
   }
 
   /**
-   * Publishes to a users facebook timeline.
+   * Publishes to a user's Facebook timeline.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The username of the PilotUser to upload to facebook for.
-   * @param inputStream The inputStream for a file passed in the POST request.
-   * @param contentDispositionHeader Addition file information automatically included.
-   * @param type The type of file passed in (Photo or Video).
-   * @param message The message posted to the users timeline with the included file.
+   * @param username The username of the PilotUser to upload to.
+   * @param inputStream The inputStream for the file to upload.
+   * @param contentDispositionHeader Additional information about the file to upload.
+   * @param type The type of file passed in ("photo" or "video").
+   * @param message The message to post the user's timeline with the luded file.
    * @return The uploaded file information if the request was successful.
    */
   @POST
@@ -187,11 +189,11 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches the bytes of a file at the given url.
+   * Downloads the bytes of a file at the given URL.
    *
    * @param key The authentication key for the requesting application.
-   * @param url the url of the file to get bytes for.
-   * @return picture represented as a byte array.
+   * @param url The URL of the file to download.
+   * @return The file represented as a byte array.
    */
   @GET
   @Path("/mediaBytes")
@@ -229,11 +231,13 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches all the videos of a specific user.
+   * Fetches all the videos for the requested PilotUser username.
+   * This method does not download the actual bytes of the videos.
+   * To download the bytes, use the method {@link #getMediaBytes(Key, String) getMediaBytes}
    *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get videos for.
-   * @return A list of the videos uploaded by the user.
+   * @return A list of the videos that the user has on Facebook.
    */
   @GET
   @Path("/videos")
@@ -260,11 +264,11 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches a an extended token given an existing token.
+   * Fetches an extended Facebook access token for the PilotUser.
    *
    * @param key The authentication key for the requesting application.
    * @param username The name of the PilotUser to fetch an extended token for.
-   * @return An extended Facebook user token.
+   * @return The extended Facebook access token.
    */
   @GET
   @Path("/extendedToken")
@@ -300,10 +304,11 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches the loginDialogUrl for setting user permissions with Facebook.
+   * Retrieves an authentication URL that a new user should be
+   * presented with to approve permissions.
    *
    * @param key The authentication key for the requesting application.
-   * @return The url string used to set permissions.
+   * @return The URL to redirect the user to.
    */
   @GET
   @Path("/oauthUrl")

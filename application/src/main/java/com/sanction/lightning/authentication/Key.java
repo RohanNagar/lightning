@@ -27,12 +27,6 @@ public class Key {
     return secret;
   }
 
-  /**
-   * Compares for equality in another key object.
-   *
-   * @param key another object of type Key
-   * @return a boolean
-   */
   @Override
   public boolean equals(Object key) {
     if (this == key) {

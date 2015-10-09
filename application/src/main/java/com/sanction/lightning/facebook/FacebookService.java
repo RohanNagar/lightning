@@ -34,9 +34,9 @@ public class FacebookService {
   /**
    * Constructs a new FacebookService for making requests to Facebook.
    *
-   * @param facebookAccessToken The access token for the user.
-   * @param facebookApplicationId The facebook application id.
-   * @param facebookApplicationSecret The authenticating application secret.
+   * @param facebookAccessToken The authenticating user's access token.
+   * @param facebookApplicationId The requesting application's ID.
+   * @param facebookApplicationSecret The requesting application's secret.
    */
   public FacebookService(String facebookAccessToken, String facebookApplicationId,
                          String facebookApplicationSecret) {
@@ -49,8 +49,8 @@ public class FacebookService {
   /**
    * Constructs a new FacebookService for making requests to Facebook.
    *
-   * @param facebookApplicationId The Facebook consumer application id.
-   * @param facebookApplicationSecret The Facebook consumer application secret.
+   * @param facebookApplicationId The requesting application's ID.
+   * @param facebookApplicationSecret The requesting application's secret.
    */
   public FacebookService(String facebookApplicationId, String facebookApplicationSecret) {
     this.client = new DefaultFacebookClient(VERSION);
@@ -59,9 +59,9 @@ public class FacebookService {
   }
 
   /**
-   * Gets Facebook user information for a specific user.
+   * Retrieves Facebook user information for the authenticating user.
    *
-   * @return A FacebookUser object containing user information.
+   * @return A FacebookUser object containing the user's information.
    */
   public FacebookUser getFacebookUser() {
     return client.fetchObject("me", FacebookUser.class, Parameter.with("fields",
@@ -69,9 +69,10 @@ public class FacebookService {
   }
 
   /**
-   * Gets the user's photos.
+   * Retrieves the authenticating user's Facebook photos.
+   * This method does not download the actual photo bytes.
    *
-   * @return A list of FacebookPhoto objects representing the users photos.
+   * @return A list of FacebookPhoto objects representing the user's photos.
    */
   public List<FacebookPhoto> getFacebookUserPhotos() {
     // Fetch a json object containing an array of photos, each with specified properties
@@ -100,9 +101,15 @@ public class FacebookService {
   }
 
   /**
-   * Published a file to facebook using the restFB api.
+   * Publishes a photo or video to Facebook.
    *
-   * @return A json String with returned file information denoting the call to Facebook worked.
+   * @param inputBytes The byte array that contains the bytes to upload to Facebook.
+   * @param type The type to upload. Should be either "photo" or "video"
+   * @param fileName The name to call the file on Facebook.
+   * @param message The caption for the photo or video.
+   * @param videoTitle The title of the video if uploading a video.
+   *                   Will be ignored when uploading a photo.
+   * @return A String of JSON with returned information if successful, or {@code null} on failure.
    */
   public String publishToFacebook(byte[] inputBytes, String type, String fileName,
                                   String message, String videoTitle) {
@@ -128,9 +135,10 @@ public class FacebookService {
   }
 
   /**
-   * Gets the user's videos from Facebook.
+   * Retrieves the authenticating user's Facebook videos.
+   * This method does not download the actual video bytes.
    *
-   * @return A list of FacebookVideo objects representing the users videos.
+   * @return A list of FacebookVideo objects representing the user's videos.
    */
   public List<FacebookVideo> getFacebookUserVideos() {
     JsonObject videos = client.fetchObject("me/videos", JsonObject.class,
@@ -148,7 +156,8 @@ public class FacebookService {
   }
 
   /**
-   * Sets the specified users permissions.
+   * Builds a URL that sends a user to a Facebook authentication page
+   * to request the correct permessions.
    *
    * @return The URL string for the permissions URL.
    */
@@ -164,9 +173,10 @@ public class FacebookService {
   }
 
   /**
-   * Fetches an extended token from Facebook.
+   * Retrieves an extended token for the authenticating user from Facebook,
+   * using their existing token.
    *
-   * @return An extended token, using the existing token.
+   * @return The extended token.
    */
   public String getFacebookExtendedToken() {
     AccessToken accessToken = client
