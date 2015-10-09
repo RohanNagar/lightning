@@ -19,7 +19,6 @@ import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookPhotoDetail;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
-import com.sanction.lightning.utils.CustomWebRequester;
 
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class FacebookService {
   public FacebookService(String facebookAccessToken, String facebookApplicationId,
                          String facebookApplicationSecret) {
     this.client = new DefaultFacebookClient(facebookAccessToken, facebookApplicationSecret,
-            new CustomWebRequester(), new DefaultJsonMapper(), VERSION);
+        VERSION);
     this.appId = facebookApplicationId;
     this.appSecret = facebookApplicationSecret;
   }
@@ -157,17 +156,17 @@ public class FacebookService {
 
   /**
    * Builds a URL that sends a user to a Facebook authentication page
-   * to request the correct permessions.
+   * to request the correct permissions.
    *
    * @return The URL string for the permissions URL.
    */
   public String getOauthUrl() {
-    ScopeBuilder scopeBuilder = new ScopeBuilder();
-    scopeBuilder.addPermission(UserDataPermissions.USER_PHOTOS);
-    scopeBuilder.addPermission(UserDataPermissions.USER_VIDEOS);
-    scopeBuilder.addPermission(UserDataPermissions.USER_POSTS);
-    scopeBuilder.addPermission(UserDataPermissions.USER_ACTIONS_VIDEO);
-    scopeBuilder.addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
+    ScopeBuilder scopeBuilder = new ScopeBuilder()
+        .addPermission(UserDataPermissions.USER_PHOTOS)
+        .addPermission(UserDataPermissions.USER_VIDEOS)
+        .addPermission(UserDataPermissions.USER_POSTS)
+        .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
+        .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
     return client.getLoginDialogUrl(appId, REDIRECT_URL, scopeBuilder);
   }
