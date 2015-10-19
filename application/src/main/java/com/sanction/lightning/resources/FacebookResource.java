@@ -7,13 +7,11 @@ import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
-import com.sanction.lightning.utils.UrlService;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
 
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -31,6 +29,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit.RetrofitError;
 
 @Path("/facebook")
 @Produces(MediaType.APPLICATION_JSON)
@@ -39,22 +38,18 @@ public class FacebookResource {
 
   private final ThunderClient thunderClient;
   private final FacebookServiceFactory facebookServiceFactory;
-  private final UrlService urlService;
 
   /**
    * Constructs a new FacebookResource to handle Facebook HTTP requests.
    *
    * @param thunderClient Client for connecting to Thunder.
    * @param facebookServiceFactory A factory to create new instances of FacebookService.
-   * @param urlService A helper class for HTTP requests.
    */
   @Inject
   public FacebookResource(ThunderClient thunderClient,
-                          FacebookServiceFactory facebookServiceFactory,
-                          UrlService urlService) {
+                          FacebookServiceFactory facebookServiceFactory) {
     this.thunderClient = thunderClient;
     this.facebookServiceFactory = facebookServiceFactory;
-    this.urlService = urlService;
   }
 
   /**
@@ -72,7 +67,22 @@ public class FacebookResource {
               .entity("'username' query parameter is required for getUser").build();
     }
 
-    PilotUser pilotUser = thunderClient.getUser(username);
+    PilotUser pilotUser;
+    try {
+      pilotUser = thunderClient.getUser(username);
+    } catch (RetrofitError e) {
+      // If the Error has a null response, then Thunder is down.
+      if (e.getResponse() == null) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("Error: " + e.getMessage()).build();
+      }
+
+      // Otherwise, return the response that Thunder gave.
+      return Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build();
+    }
+
     FacebookService facebookService
         = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
@@ -91,7 +101,6 @@ public class FacebookResource {
   /**
    * Fetches all the photos for the requested PilotUser username.
    * This method does not download the actual bytes of the photos.
-   * To download the bytes, use the method {@link #getMediaBytes(Key, String) getMediaBytes}
    *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get photos for.
@@ -105,7 +114,22 @@ public class FacebookResource {
               .entity("'username' query parameter is required for getPhotos").build();
     }
 
-    PilotUser pilotUser = thunderClient.getUser(username);
+    PilotUser pilotUser;
+    try {
+      pilotUser = thunderClient.getUser(username);
+    } catch (RetrofitError e) {
+      // If the Error has a null response, then Thunder is down.
+      if (e.getResponse() == null) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("Error: " + e.getMessage()).build();
+      }
+
+      // Otherwise, return the response that Thunder gave.
+      return Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build();
+    }
+
     FacebookService facebookService
             = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
@@ -163,7 +187,22 @@ public class FacebookResource {
               .entity("'file' is required for publish").build();
     }
 
-    PilotUser pilotUser = thunderClient.getUser(username);
+    PilotUser pilotUser;
+    try {
+      pilotUser = thunderClient.getUser(username);
+    } catch (RetrofitError e) {
+      // If the Error has a null response, then Thunder is down.
+      if (e.getResponse() == null) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("Error: " + e.getMessage()).build();
+      }
+
+      // Otherwise, return the response that Thunder gave.
+      return Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build();
+    }
+
     FacebookService facebookService =
         facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
@@ -180,51 +219,8 @@ public class FacebookResource {
   }
 
   /**
-   * Downloads the bytes of a file at the given URL.
-   *
-   * @param key The authentication key for the requesting application.
-   * @param url The URL of the file to download.
-   * @return The file represented as a byte array.
-   */
-  @GET
-  @Path("/mediaBytes")
-  public Response getMediaBytes(@Auth Key key, @QueryParam("url") String url) {
-    if (url == null) {
-      return Response.status(Response.Status.BAD_REQUEST)
-              .entity("'url' query parameter is required for getMediaBytes").build();
-    }
-
-    URLConnection connection = urlService.fetchUrlConnection(url);
-
-    if (connection == null) {
-      LOG.error("Bad URL");
-      return Response.status(Response.Status.BAD_REQUEST)
-              .entity("Request rejected due to bad URL").build();
-    }
-
-    InputStream connectionInputStream = urlService.fetchInputStreamFromConnection(connection);
-
-    if (connectionInputStream == null) {
-      LOG.error("Bad InputStream");
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity("Error reading InputStream").build();
-    }
-
-    byte[] response = urlService.inputStreamToByteArray(connectionInputStream);
-
-    if (response == null) {
-      LOG.error("Error reading bytes");
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity("Error trying to read bytes").build();
-    }
-
-    return Response.ok(response).build();
-  }
-
-  /**
    * Fetches all the videos for the requested PilotUser username.
    * This method does not download the actual bytes of the videos.
-   * To download the bytes, use the method {@link #getMediaBytes(Key, String) getMediaBytes}
    *
    * @param key The authentication key for the requesting application.
    * @param username The username of the PilotUser to get videos for.
@@ -238,7 +234,22 @@ public class FacebookResource {
               .entity("'username' query parameter is required for getUser").build();
     }
 
-    PilotUser pilotUser = thunderClient.getUser(username);
+    PilotUser pilotUser;
+    try {
+      pilotUser = thunderClient.getUser(username);
+    } catch (RetrofitError e) {
+      // If the Error has a null response, then Thunder is down.
+      if (e.getResponse() == null) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("Error: " + e.getMessage()).build();
+      }
+
+      // Otherwise, return the response that Thunder gave.
+      return Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build();
+    }
+
     FacebookService facebookService
             = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
@@ -269,7 +280,22 @@ public class FacebookResource {
               .entity("'username' query parameter is required").build();
     }
 
-    PilotUser pilotUser = thunderClient.getUser(username);
+    PilotUser pilotUser;
+    try {
+      pilotUser = thunderClient.getUser(username);
+    } catch (RetrofitError e) {
+      // If the Error has a null response, then Thunder is down.
+      if (e.getResponse() == null) {
+        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("Error: " + e.getMessage()).build();
+      }
+
+      // Otherwise, return the response that Thunder gave.
+      return Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build();
+    }
+
     FacebookService facebookService
             = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
@@ -286,9 +312,12 @@ public class FacebookResource {
     pilotUser = new PilotUser(pilotUser.getUsername(), pilotUser.getPassword(), extendedToken,
         pilotUser.getTwitterAccessSecret(), pilotUser.getTwitterAccessSecret());
 
-    if (thunderClient.updateUser(pilotUser) == null) {
-      return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-              .entity("Request failed: Could not connect to database").build();
+    try {
+      thunderClient.updateUser(pilotUser);
+    } catch (RetrofitError e) {
+      return Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build();
     }
 
     return Response.ok(extendedToken).build();
