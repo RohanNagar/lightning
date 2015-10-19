@@ -145,7 +145,7 @@ public class FacebookService {
     JsonArray videoArray = videos.getJsonArray("data");
 
     List<FacebookVideo> videoList = Lists.newArrayList();
-    for (int i = 0; i < videos.length() - 1; i++) {
+    for (int i = 0; i < videoArray.length() - 1; i++) {
       JsonObject obj = videoArray.getJsonObject(i);
       FacebookVideo vid = new FacebookVideo(obj.getString("id"), obj.getString("source"));
       videoList.add(vid);

@@ -1,6 +1,5 @@
 package com.sanction.lightning;
 
-import com.sanction.lightning.utils.UrlService;
 import com.sanction.thunder.ThunderClient;
 import dagger.Module;
 import dagger.Provides;
@@ -19,11 +18,5 @@ public class LightningModule {
   @Provides
   public ThunderClient provideThunderClient() {
     return thunderClient;
-  }
-
-  @Singleton
-  @Provides
-  public UrlService provideUrlService() {
-    return new UrlService();
   }
 }
