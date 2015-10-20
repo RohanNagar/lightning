@@ -12,7 +12,6 @@ import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
