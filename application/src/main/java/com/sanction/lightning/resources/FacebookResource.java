@@ -77,6 +77,12 @@ public class FacebookResource {
                 .entity("Error: " + e.getMessage()).build();
       }
 
+      // If the we get an unauthorized then return an Internal Server Error
+      if (e.getResponse().getStatus() == 401) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Database error: " + e.getMessage()).build();
+      }
+
       // Otherwise, return the response that Thunder gave.
       return Response.status(e.getResponse().getStatus())
               .entity(e.getResponse().getReason())
@@ -122,6 +128,12 @@ public class FacebookResource {
       if (e.getResponse() == null) {
         return Response.status(Response.Status.SERVICE_UNAVAILABLE)
                 .entity("Error: " + e.getMessage()).build();
+      }
+
+      // If the we get an unauthorized then return an Internal Server Error
+      if (e.getResponse().getStatus() == 401) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Database error: " + e.getMessage()).build();
       }
 
       // Otherwise, return the response that Thunder gave.
@@ -197,6 +209,12 @@ public class FacebookResource {
                 .entity("Error: " + e.getMessage()).build();
       }
 
+      // If the we get an unauthorized then return an Internal Server Error
+      if (e.getResponse().getStatus() == 401) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Database error: " + e.getMessage()).build();
+      }
+
       // Otherwise, return the response that Thunder gave.
       return Response.status(e.getResponse().getStatus())
               .entity(e.getResponse().getReason())
@@ -244,6 +262,12 @@ public class FacebookResource {
                 .entity("Error: " + e.getMessage()).build();
       }
 
+      // If the we get an unauthorized then return an Internal Server Error
+      if (e.getResponse().getStatus() == 401) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Database error: " + e.getMessage()).build();
+      }
+
       // Otherwise, return the response that Thunder gave.
       return Response.status(e.getResponse().getStatus())
               .entity(e.getResponse().getReason())
@@ -288,6 +312,12 @@ public class FacebookResource {
       if (e.getResponse() == null) {
         return Response.status(Response.Status.SERVICE_UNAVAILABLE)
                 .entity("Error: " + e.getMessage()).build();
+      }
+
+      // If the we get an unauthorized then return an Internal Server Error
+      if (e.getResponse().getStatus() == 401) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Database error: " + e.getMessage()).build();
       }
 
       // Otherwise, return the response that Thunder gave.
