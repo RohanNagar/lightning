@@ -72,6 +72,17 @@ public class FacebookResourceTest {
   }
 
   @Test
+  public void testGetUserWithUnauthorizedResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
+            Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class))).thenThrow(error);
+    Response response = resource.getUser(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void testGetUserWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
@@ -122,6 +133,17 @@ public class FacebookResourceTest {
     Response response = resource.getPhotos(key, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
+  }
+
+  @Test
+  public void testGetPhotosWithUnauthorizedResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
+            Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class))).thenThrow(error);
+    Response response = resource.getPhotos(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @Test
@@ -200,6 +222,18 @@ public class FacebookResourceTest {
             null, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
+  }
+
+  @Test
+  public void testPublishWithUnauthorizedResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
+            Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class))).thenThrow(error);
+    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
+            null, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @Test
@@ -289,6 +323,17 @@ public class FacebookResourceTest {
   }
 
   @Test
+  public void testGetVideosWithUnauthorizedResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
+            Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class))).thenThrow(error);
+    Response response = resource.getVideos(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
   @SuppressWarnings("unchecked")
   public void testGetVideosWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
@@ -364,6 +409,17 @@ public class FacebookResourceTest {
     Response response = resource.getExtendedToken(key, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
+  }
+
+  @Test
+  public void testGetExtendedTokenWithUnauthorizedResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
+            Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class))).thenThrow(error);
+    Response response = resource.getExtendedToken(key, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @Test
