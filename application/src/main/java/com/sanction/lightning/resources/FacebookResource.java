@@ -72,6 +72,7 @@ public class FacebookResource {
     try {
       pilotUser = getPilotUser(username);
     } catch (ThunderConnectionException e) {
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
       return e.getResponse();
     }
 
@@ -82,9 +83,9 @@ public class FacebookResource {
     try {
       facebookUser = facebookService.getFacebookUser();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}", username, e);
+      LOG.error("Bad Facebook OAuth token for username {}.", username, e);
       return Response.status(Response.Status.NOT_FOUND)
-              .entity("Request rejected due to bad OAuth token").build();
+              .entity("Request rejected due to bad OAuth token.").build();
     }
 
     return Response.ok(facebookUser).build();
@@ -110,6 +111,7 @@ public class FacebookResource {
     try {
       pilotUser = getPilotUser(username);
     } catch (ThunderConnectionException e) {
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
       return e.getResponse();
     }
 
@@ -120,9 +122,9 @@ public class FacebookResource {
     try {
       photoList = facebookService.getFacebookUserPhotos();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}", username, e);
+      LOG.error("Bad Facebook OAuth token for username {}.", username, e);
       return Response.status(Response.Status.NOT_FOUND)
-              .entity("Request rejected due to bad OAuth token").build();
+              .entity("Request rejected due to bad OAuth token.").build();
     }
 
     return Response.ok(photoList).build();
@@ -165,7 +167,6 @@ public class FacebookResource {
     }
 
     if (inputStream == null) {
-      LOG.error("InputStream was null.");
       return Response.status(Response.Status.BAD_REQUEST)
               .entity("'file' is required for publish").build();
     }
@@ -174,6 +175,7 @@ public class FacebookResource {
     try {
       pilotUser = getPilotUser(username);
     } catch (ThunderConnectionException e) {
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
       return e.getResponse();
     }
 
@@ -184,7 +186,7 @@ public class FacebookResource {
             contentDispositionHeader.getFileName(), message, videoTitle);
 
     if (uploadedFile == null) {
-      LOG.error("Error uploading to Facebook.");
+      LOG.error("Error uploading to Facebook for username {}.", username);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
               .entity("Error uploading to Facebook.").build();
     }
@@ -212,6 +214,7 @@ public class FacebookResource {
     try {
       pilotUser = getPilotUser(username);
     } catch (ThunderConnectionException e) {
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
       return e.getResponse();
     }
 
@@ -222,9 +225,9 @@ public class FacebookResource {
     try {
       videoList = facebookService.getFacebookUserVideos();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}", username, e);
+      LOG.error("Bad Facebook OAuth token for username {}.", username, e);
       return Response.status(Response.Status.NOT_FOUND)
-              .entity("Request rejected due to bad OAuth token").build();
+              .entity("Request rejected due to bad OAuth token.").build();
     }
 
     return Response.ok(videoList).build();
@@ -249,6 +252,7 @@ public class FacebookResource {
     try {
       pilotUser = getPilotUser(username);
     } catch (ThunderConnectionException e) {
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
       return e.getResponse();
     }
 
@@ -259,9 +263,9 @@ public class FacebookResource {
     try {
       extendedToken = facebookService.getFacebookExtendedToken();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth Token", e);
+      LOG.error("Bad Facebook OAuth Token for username {}.", username, e);
       return Response.status(Response.Status.NOT_FOUND)
-              .entity("Request rejected due to bad OAuth token").build();
+              .entity("Request rejected due to bad OAuth token.").build();
     }
 
     // Set up the PilotUser with the extended token
@@ -271,6 +275,7 @@ public class FacebookResource {
     try {
       thunderClient.updateUser(pilotUser);
     } catch (RetrofitError e) {
+      LOG.error("Unable to update PilotUser ({}) through Thunder.", username, e);
       return Response.status(e.getResponse().getStatus())
               .entity(e.getResponse().getReason())
               .build();
@@ -295,9 +300,9 @@ public class FacebookResource {
     try {
       permissionsUrl = facebookService.getOauthUrl();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username", e);
+      LOG.error("Bad Facebook OAuth token.", e);
       return Response.status(Response.Status.NOT_FOUND)
-              .entity("Request rejected due to bad OAuth token").build();
+              .entity("Request rejected due to bad OAuth token.").build();
     }
 
     return Response.ok(permissionsUrl).build();
@@ -311,6 +316,7 @@ public class FacebookResource {
     } catch (RetrofitError e) {
       // If the error has a null response, then Thunder is down.
       if (e.getResponse() == null) {
+        LOG.error("Thunder is currently unavailable.");
         throw new ThunderConnectionException(
             Response.status(Response.Status.SERVICE_UNAVAILABLE)
                 .entity("Error: " + e.getMessage())
@@ -319,6 +325,7 @@ public class FacebookResource {
 
       // If we are unauthorized, our API keys are incorrect - Internal Server Error.
       if (e.getResponse().getStatus() == 401) {
+        LOG.error("Incorrect API Keys to access Thunder.");
         throw new ThunderConnectionException(
             Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity("Database error: " + e.getMessage())
@@ -326,6 +333,7 @@ public class FacebookResource {
       }
 
       // Otherwise, we should supply the response that Thunder gave.
+      LOG.error("Error accessing Thunder: {}", e.getResponse().getReason());
       throw new ThunderConnectionException(
           Response.status(e.getResponse().getStatus())
               .entity(e.getResponse().getReason())
