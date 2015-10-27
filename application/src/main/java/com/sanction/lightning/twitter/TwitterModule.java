@@ -14,7 +14,8 @@ public class TwitterModule {
   }
 
   /**
-   * Provides a new TwitterServiceFactory for generating TwitterServices.
+   * Provides a new TwitterServiceFactory for generating instances of TwitterService objects.
+   *
    * @return A new instance of TwitterServiceFactory.
    */
   @Singleton

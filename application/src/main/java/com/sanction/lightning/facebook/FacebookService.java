@@ -32,7 +32,7 @@ public class FacebookService {
   private final String appSecret;
 
   /**
-   * Constructs a new FacebookService for making requests to Facebook.
+   * Constructs a new FacebookService for use with an authenticating user.
    *
    * @param facebookAccessToken The authenticating user's access token.
    * @param facebookApplicationId The requesting application's ID.
@@ -47,7 +47,7 @@ public class FacebookService {
   }
 
   /**
-   * Constructs a new FacebookService for making requests to Facebook.
+   * Constructs a new FacebookService for use without an authenticating user.
    *
    * @param facebookApplicationId The requesting application's ID.
    * @param facebookApplicationSecret The requesting application's secret.

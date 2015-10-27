@@ -13,10 +13,16 @@ public class FacebookModule {
     this.facebookConfiguration = facebookConfiguration;
   }
 
+  /**
+   * Provides a new FacebookServiceFactory for generating instances of FacebookService objects.
+   *
+   * @return A new instance of FacebookServiceFactory.
+   */
   @Singleton
   @Provides
   public FacebookServiceFactory provideFacebookServiceFactory() {
-    return new FacebookServiceFactory(facebookConfiguration.getAppId(),
-            facebookConfiguration.getAppSecret());
+    return new FacebookServiceFactory(
+        facebookConfiguration.getAppId(),
+        facebookConfiguration.getAppSecret());
   }
 }
