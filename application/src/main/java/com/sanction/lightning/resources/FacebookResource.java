@@ -2,6 +2,7 @@ package com.sanction.lightning.resources;
 
 import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
+import com.sanction.lightning.exception.ThunderConnectionException;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
@@ -69,24 +70,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = thunderClient.getUser(username);
-    } catch (RetrofitError e) {
-      // If the Error has a null response, then Thunder is down.
-      if (e.getResponse() == null) {
-        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("Error: " + e.getMessage()).build();
-      }
-
-      // If the we get an unauthorized then return an Internal Server Error
-      if (e.getResponse().getStatus() == 401) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Database error: " + e.getMessage()).build();
-      }
-
-      // Otherwise, return the response that Thunder gave.
-      return Response.status(e.getResponse().getStatus())
-              .entity(e.getResponse().getReason())
-              .build();
+      pilotUser = getPilotUser(username);
+    } catch (ThunderConnectionException e) {
+      return e.getResponse();
     }
 
     FacebookService facebookService
@@ -122,24 +108,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = thunderClient.getUser(username);
-    } catch (RetrofitError e) {
-      // If the Error has a null response, then Thunder is down.
-      if (e.getResponse() == null) {
-        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("Error: " + e.getMessage()).build();
-      }
-
-      // If the we get an unauthorized then return an Internal Server Error
-      if (e.getResponse().getStatus() == 401) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Database error: " + e.getMessage()).build();
-      }
-
-      // Otherwise, return the response that Thunder gave.
-      return Response.status(e.getResponse().getStatus())
-              .entity(e.getResponse().getReason())
-              .build();
+      pilotUser = getPilotUser(username);
+    } catch (ThunderConnectionException e) {
+      return e.getResponse();
     }
 
     FacebookService facebookService
@@ -201,24 +172,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = thunderClient.getUser(username);
-    } catch (RetrofitError e) {
-      // If the Error has a null response, then Thunder is down.
-      if (e.getResponse() == null) {
-        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("Error: " + e.getMessage()).build();
-      }
-
-      // If the we get an unauthorized then return an Internal Server Error
-      if (e.getResponse().getStatus() == 401) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Database error: " + e.getMessage()).build();
-      }
-
-      // Otherwise, return the response that Thunder gave.
-      return Response.status(e.getResponse().getStatus())
-              .entity(e.getResponse().getReason())
-              .build();
+      pilotUser = getPilotUser(username);
+    } catch (ThunderConnectionException e) {
+      return e.getResponse();
     }
 
     FacebookService facebookService =
@@ -254,24 +210,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = thunderClient.getUser(username);
-    } catch (RetrofitError e) {
-      // If the Error has a null response, then Thunder is down.
-      if (e.getResponse() == null) {
-        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("Error: " + e.getMessage()).build();
-      }
-
-      // If the we get an unauthorized then return an Internal Server Error
-      if (e.getResponse().getStatus() == 401) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Database error: " + e.getMessage()).build();
-      }
-
-      // Otherwise, return the response that Thunder gave.
-      return Response.status(e.getResponse().getStatus())
-              .entity(e.getResponse().getReason())
-              .build();
+      pilotUser = getPilotUser(username);
+    } catch (ThunderConnectionException e) {
+      return e.getResponse();
     }
 
     FacebookService facebookService
@@ -306,24 +247,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = thunderClient.getUser(username);
-    } catch (RetrofitError e) {
-      // If the Error has a null response, then Thunder is down.
-      if (e.getResponse() == null) {
-        return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("Error: " + e.getMessage()).build();
-      }
-
-      // If the we get an unauthorized then return an Internal Server Error
-      if (e.getResponse().getStatus() == 401) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Database error: " + e.getMessage()).build();
-      }
-
-      // Otherwise, return the response that Thunder gave.
-      return Response.status(e.getResponse().getStatus())
-              .entity(e.getResponse().getReason())
-              .build();
+      pilotUser = getPilotUser(username);
+    } catch (ThunderConnectionException e) {
+      return e.getResponse();
     }
 
     FacebookService facebookService
@@ -375,5 +301,37 @@ public class FacebookResource {
     }
 
     return Response.ok(permissionsUrl).build();
+  }
+
+  private PilotUser getPilotUser(String username) {
+    PilotUser pilotUser;
+
+    try {
+      pilotUser = thunderClient.getUser(username);
+    } catch (RetrofitError e) {
+      // If the error has a null response, then Thunder is down.
+      if (e.getResponse() == null) {
+        throw new ThunderConnectionException(
+            Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("Error: " + e.getMessage())
+                .build());
+      }
+
+      // If we are unauthorized, our API keys are incorrect - Internal Server Error.
+      if (e.getResponse().getStatus() == 401) {
+        throw new ThunderConnectionException(
+            Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Database error: " + e.getMessage())
+                .build());
+      }
+
+      // Otherwise, we should supply the response that Thunder gave.
+      throw new ThunderConnectionException(
+          Response.status(e.getResponse().getStatus())
+              .entity(e.getResponse().getReason())
+              .build());
+    }
+
+    return pilotUser;
   }
 }
