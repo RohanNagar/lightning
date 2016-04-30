@@ -1,3 +1,5 @@
+<img align="left" src="application/src/main/resources/logo.png">
+
 # Lightning
 [![Build Status](https://travis-ci.org/RohanNagar/lightning.svg?branch=master)](https://travis-ci.org/RohanNagar/lightning)
 ![Version](https://img.shields.io/badge/version-v0.0.0-7f8c8d.svg)
