@@ -2,7 +2,8 @@
 
 # Lightning
 [![Build Status](https://travis-ci.org/RohanNagar/lightning.svg?branch=master)](https://travis-ci.org/RohanNagar/lightning)
-![Version](https://img.shields.io/badge/version-v0.1.0-7f8c8d.svg)
+[![Coverage Status](https://coveralls.io/repos/github/RohanNagar/lightning/badge.svg?branch=master)](https://coveralls.io/github/RohanNagar/lightning?branch=master)
+[![Version](https://img.shields.io/badge/version-v0.1.0-7f8c8d.svg)](https://github.com/RohanNagar/lightning/releases)
 [![Twitter](https://img.shields.io/badge/twitter-%40RohanNagar22-00aced.svg)](http://twitter.com/RohanNagar22)
 
 Lightning is a real-time social media REST API, to be used in conjunction with [Thunder](https://github.com/RohanNagar/thunder). Lightning provides methods to request data from various 3rd party social media services, including Facebook and Twitter.
