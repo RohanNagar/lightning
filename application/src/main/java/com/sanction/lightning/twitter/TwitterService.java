@@ -85,8 +85,8 @@ public class TwitterService {
     } catch (TwitterException e) {
       LOG.error("Unable to get authorization URL from Twitter. "
           + "Twitter error code: {}", e.getErrorCode(), e);
+      // TODO: replace redirect URL
       return null;
     }
   }
-
 }

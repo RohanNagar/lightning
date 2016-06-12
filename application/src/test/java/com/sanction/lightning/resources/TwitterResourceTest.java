@@ -1,5 +1,6 @@
 package com.sanction.lightning.resources;
 
+import com.codahale.metrics.MetricRegistry;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
@@ -20,12 +21,14 @@ import static org.mockito.Mockito.when;
 public class TwitterResourceTest {
   private final ThunderClient thunderClient = mock(ThunderClient.class);
   private final TwitterServiceFactory serviceFactory = mock(TwitterServiceFactory.class);
+  private final MetricRegistry metrics = new MetricRegistry();
   private final TwitterService service = mock(TwitterService.class);
 
   private final PilotUser pilotUser = mock(PilotUser.class);
   private final Key key = mock(Key.class);
 
-  private final TwitterResource resource = new TwitterResource(thunderClient, serviceFactory);
+  private final TwitterResource resource = new TwitterResource(thunderClient, metrics,
+      serviceFactory);
 
   @Before
   public void setup() {
@@ -34,7 +37,7 @@ public class TwitterResourceTest {
     when(serviceFactory.newTwitterService(anyString(), anyString())).thenReturn(service);
 
     // Setup ThunderClient
-    when(thunderClient.getUser(anyString())).thenReturn(pilotUser);
+    when(thunderClient.getUser(anyString(), anyString())).thenReturn(pilotUser);
 
     // Setup PilotUser
     when(pilotUser.getTwitterAccessToken()).thenReturn("twitterAccessToken");
@@ -44,7 +47,14 @@ public class TwitterResourceTest {
   /* User Tests */
   @Test
   public void testGetUserWithNullUsername() {
-    Response response = resource.getUser(key, null);
+    Response response = resource.getUser(key, null, "password");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetUserWithNullPassword() {
+    Response response = resource.getUser(key, "Test", null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -53,7 +63,7 @@ public class TwitterResourceTest {
   public void testGetUserWithNullTwitterResponse() {
     when(service.getTwitterUser()).thenReturn(null);
 
-    Response response = resource.getUser(key, "Test");
+    Response response = resource.getUser(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -63,7 +73,7 @@ public class TwitterResourceTest {
     TwitterUser mockUser = mock(TwitterUser.class);
     when(service.getTwitterUser()).thenReturn(mockUser);
 
-    Response response = resource.getUser(key, "Test");
+    Response response = resource.getUser(key, "Test", "password");
     TwitterUser user = (TwitterUser) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
