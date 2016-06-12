@@ -1,5 +1,6 @@
 package com.sanction.lightning.resources;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
@@ -29,15 +30,17 @@ import static org.mockito.Mockito.when;
 public class FacebookResourceTest {
   private final ThunderClient thunderClient = mock(ThunderClient.class);
   private final FacebookServiceFactory serviceFactory = mock(FacebookServiceFactory.class);
+  private final MetricRegistry metrics = new MetricRegistry();
   private final FacebookService facebookService = mock(FacebookService.class);
   private final InputStream inputStream = mock(InputStream.class);
   private final FormDataContentDisposition contentDisposition =
-          mock(FormDataContentDisposition.class);
+      mock(FormDataContentDisposition.class);
 
   private final PilotUser pilotUser = mock(PilotUser.class);
   private final Key key = mock(Key.class);
 
-  private final FacebookResource resource = new FacebookResource(thunderClient, serviceFactory);
+  private final FacebookResource resource = new FacebookResource(thunderClient, metrics,
+      serviceFactory);
 
   @Before
   public void setup() {
@@ -46,7 +49,7 @@ public class FacebookResourceTest {
     when(serviceFactory.newFacebookService()).thenReturn(facebookService);
 
     // Setup ThunderClient
-    when(thunderClient.getUser(anyString())).thenReturn(pilotUser);
+    when(thunderClient.getUser(anyString(), anyString())).thenReturn(pilotUser);
 
     // Setup PilotUser
     when(pilotUser.getFacebookAccessToken()).thenReturn("fbAccessToken");
@@ -55,7 +58,14 @@ public class FacebookResourceTest {
   /* User Tests */
   @Test
   public void testGetUserWithNullUsername() {
-    Response response = resource.getUser(key, null);
+    Response response = resource.getUser(key, null, "password");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetUserWithNullPassword() {
+    Response response = resource.getUser(key, "Test", null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -65,8 +75,8 @@ public class FacebookResourceTest {
   public void testGetUserWithNullRetrofitResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(null);
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getUser(key, "Test");
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getUser(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -75,9 +85,9 @@ public class FacebookResourceTest {
   public void testGetUserWithUnauthorizedResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getUser(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getUser(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -87,9 +97,9 @@ public class FacebookResourceTest {
   public void testGetUserWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getPhotos(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getPhotos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -99,7 +109,7 @@ public class FacebookResourceTest {
   public void testGetUserWithExpiredOAuth() {
     when(facebookService.getFacebookUser()).thenThrow(FacebookOAuthException.class);
 
-    Response response = resource.getUser(key, "Test");
+    Response response = resource.getUser(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -109,7 +119,7 @@ public class FacebookResourceTest {
     FacebookUser facebookUser = mock(FacebookUser.class);
     when(facebookService.getFacebookUser()).thenReturn(facebookUser);
 
-    Response response = resource.getUser(key, "Test");
+    Response response = resource.getUser(key, "Test", "password");
     FacebookUser userResponse = (FacebookUser) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -119,7 +129,14 @@ public class FacebookResourceTest {
   /* Photo Tests */
   @Test
   public void testGetPhotosWithNullUsername() {
-    Response response = resource.getPhotos(key, null);
+    Response response = resource.getPhotos(key, null, "password");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetPhotosWithNullPassword() {
+    Response response = resource.getPhotos(key, "Test", null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -129,8 +146,8 @@ public class FacebookResourceTest {
   public void testGetPhotosWithNullRetrofitResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(null);
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getPhotos(key, "Test");
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getPhotos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -139,9 +156,9 @@ public class FacebookResourceTest {
   public void testGetPhotosWithUnauthorizedResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getPhotos(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getPhotos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -151,9 +168,9 @@ public class FacebookResourceTest {
   public void testGetPhotosWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getPhotos(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getPhotos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -161,10 +178,10 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetPhotosWithOauthException() {
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.getFacebookUserPhotos()).thenThrow(FacebookOAuthException.class);
 
-    Response response = resource.getPhotos(key, "Test");
+    Response response = resource.getPhotos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -173,10 +190,10 @@ public class FacebookResourceTest {
   @SuppressWarnings("unchecked")
   public void testGetPhotos() {
     List<FacebookPhoto> fakeList = Lists.newArrayList();
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.getFacebookUserPhotos()).thenReturn(fakeList);
 
-    Response response = resource.getPhotos(key, "Test");
+    Response response = resource.getPhotos(key, "Test", "password");
     List<FacebookPhoto> userResponse = (List<FacebookPhoto>) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -186,28 +203,35 @@ public class FacebookResourceTest {
   /* Publish Tests */
   @Test
   public void testPublishWithNullUsername() {
-    Response response = resource.publish(key, null, null, null, null, null, null);
+    Response response = resource.publish(key, null, null, null, null, null, null, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullPassword() {
+    Response response = resource.publish(key, "Test", null, null, null, null, null, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWithNullType() {
-    Response response = resource.publish(key, "Test", null, null, null, null, null);
+    Response response = resource.publish(key, "Test", "password", null, null, null, null, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWithBadTypeValue() {
-    Response response = resource.publish(key, "Test", null, null, "Test", null, null);
+    Response response = resource.publish(key, "Test", "password", null, null, "Test", null, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWIthNullInputStream() {
-    Response response = resource.publish(key, "Test", null, null, "photo", null, null);
+    Response response = resource.publish(key, "Test", "password", null, null, "photo", null, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -217,9 +241,9 @@ public class FacebookResourceTest {
   public void testPublishWithNullRetrofitResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(null);
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
-            null, "Test");
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", null, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -228,10 +252,10 @@ public class FacebookResourceTest {
   public void testPublishWithUnauthorizedResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
-            null, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", null, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -241,34 +265,34 @@ public class FacebookResourceTest {
   public void testPublishWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
-            null, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", null, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
 
   @Test
   public void testPublishWithNullFacebookResponse() {
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.publishToFacebook(any(InputStream.class),
-            any(String.class), any(String.class), any(String.class),
-            any(String.class))).thenReturn(null);
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
-            "Test", "Test");
+        any(String.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn(null);
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", "Test", "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
 
   @Test
   public void testPublishWithNullVideoTitle() {
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.publishToFacebook(any(InputStream.class),
-            any(String.class), any(String.class), any(String.class),
-            any(String.class))).thenReturn("Test");
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
-            "Test", null);
+        any(String.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", "Test", null);
     String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -277,12 +301,12 @@ public class FacebookResourceTest {
 
   @Test
   public void testPublishWithNullMessage() {
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.publishToFacebook(any(InputStream.class),
-            any(String.class), any(String.class), any(String.class),
-            any(String.class))).thenReturn("Test");
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition, "photo",
-            null, "Test");
+        any(String.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", null, "Test");
     String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -291,12 +315,12 @@ public class FacebookResourceTest {
 
   @Test
   public void testPublish() {
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.publishToFacebook(any(InputStream.class),
-            any(String.class), any(String.class), any(String.class),
-            any(String.class))).thenReturn("Test");
-    Response response = resource.publish(key, "Test", inputStream, contentDisposition,
-            "photo", "Test", "Test");
+        any(String.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+    Response response = resource.publish(key, "Test", "password", inputStream, contentDisposition,
+        "photo", "Test", "Test");
     String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -306,7 +330,14 @@ public class FacebookResourceTest {
   /* Video Tests */
   @Test
   public void testGetVideosWithNullUsername() {
-    Response response = resource.getVideos(key, null);
+    Response response = resource.getVideos(key, null, "password");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetVideosWithNullPassword() {
+    Response response = resource.getVideos(key, "Test", null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -316,8 +347,8 @@ public class FacebookResourceTest {
   public void testGetVideosWithNullRetrofitResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(null);
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getVideos(key, "Test");
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getVideos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -326,9 +357,9 @@ public class FacebookResourceTest {
   public void testGetVideosWithUnauthorizedResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getVideos(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getVideos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -338,9 +369,9 @@ public class FacebookResourceTest {
   public void testGetVideosWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getVideos(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getVideos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -349,9 +380,9 @@ public class FacebookResourceTest {
   @SuppressWarnings("unchecked")
   public void testGetVideosWithOauthException() {
     when(facebookService.getFacebookUserVideos()).thenThrow(FacebookOAuthException.class);
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
 
-    Response response = resource.getVideos(key, "Test");
+    Response response = resource.getVideos(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -361,9 +392,9 @@ public class FacebookResourceTest {
   public void testGetVideos() {
     List<FacebookVideo> fakeList = Lists.newArrayList();
     when(facebookService.getFacebookUserVideos()).thenReturn(fakeList);
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
 
-    Response response = resource.getVideos(key, "Test");
+    Response response = resource.getVideos(key, "Test", "password");
     List<FacebookVideo> userResponse = (List<FacebookVideo>) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -395,7 +426,14 @@ public class FacebookResourceTest {
   /* ExtendedToken Tests */
   @Test
   public void testGetExtendedTokenWithNullUsername() {
-    Response response = resource.getExtendedToken(key, null);
+    Response response = resource.getExtendedToken(key, null, "password");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetExtendedTokenWithNullPassword() {
+    Response response = resource.getExtendedToken(key, "Test", null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -405,8 +443,8 @@ public class FacebookResourceTest {
   public void testGetExtendedTokenWithNullRetrofitResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(null);
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getExtendedToken(key, "Test");
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getExtendedToken(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -415,9 +453,9 @@ public class FacebookResourceTest {
   public void testGetExtendedTokenWithUnauthorizedResponse() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 401, "Unauthorized",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getExtendedToken(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getExtendedToken(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -427,9 +465,9 @@ public class FacebookResourceTest {
   public void testGetExtendedTokenWithUnknownUser() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
-            Lists.newArrayList(), null));
-    when(thunderClient.getUser(any(String.class))).thenThrow(error);
-    Response response = resource.getExtendedToken(key, "Test");
+        Lists.newArrayList(), null));
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenThrow(error);
+    Response response = resource.getExtendedToken(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -437,10 +475,10 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetExtendedTokenWithOauthException() {
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
     when(facebookService.getFacebookExtendedToken()).thenThrow(FacebookOAuthException.class);
 
-    Response response = resource.getExtendedToken(key, "Test");
+    Response response = resource.getExtendedToken(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -450,12 +488,12 @@ public class FacebookResourceTest {
   public void testGetExtendedTokenWithFailedUpdate() {
     RetrofitError error = mock(RetrofitError.class);
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
-            Lists.newArrayList(), null));
+        Lists.newArrayList(), null));
     when(facebookService.getFacebookExtendedToken()).thenReturn("Test");
-    when(thunderClient.getUser(any(String.class))).thenReturn(pilotUser);
-    when(thunderClient.updateUser(any(PilotUser.class))).thenThrow(error);
+    when(thunderClient.getUser(any(String.class), any(String.class))).thenReturn(pilotUser);
+    when(thunderClient.updateUser(any(String.class), any(PilotUser.class))).thenThrow(error);
 
-    Response response = resource.getExtendedToken(key, "Test");
+    Response response = resource.getExtendedToken(key, "Test", "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -463,9 +501,9 @@ public class FacebookResourceTest {
   @Test
   public void testGetExtendedToken() {
     when(facebookService.getFacebookExtendedToken()).thenReturn("Test");
-    when(thunderClient.updateUser(any(PilotUser.class))).thenReturn(pilotUser);
+    when(thunderClient.updateUser(any(String.class), any(PilotUser.class))).thenReturn(pilotUser);
 
-    Response response = resource.getExtendedToken(key, "Test");
+    Response response = resource.getExtendedToken(key, "Test", "password");
     String string = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);

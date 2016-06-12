@@ -2,6 +2,7 @@ package com.sanction.lightning.authentication;
 
 import com.google.common.base.Optional;
 
+import com.sanction.lightning.LightningConfiguration;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 
@@ -13,8 +14,8 @@ public class LightningAuthenticator implements Authenticator<BasicCredentials, K
 
   private final List<Key> allKeys;
 
-  public LightningAuthenticator(List<Key> keys) {
-    this.allKeys = keys;
+  public LightningAuthenticator(LightningConfiguration config) {
+    this.allKeys = config.getApprovedKeys();
   }
 
   @Override

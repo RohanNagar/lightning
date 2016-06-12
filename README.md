@@ -46,13 +46,13 @@ Your changes will be reviewed and merged when appropriate.
 You can run the following commands using [HTTPie](https://github.com/jkbrzt/httpie) to test each of the available endpoints. Simply replace the brackets with the appropriate information and run the command via the command line.
 
 ### Facebook
-- `http -a {application}:{secret} GET localhost:9000/facebook/users?username={name}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/photos?username={name}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/videos?username={name}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/extendedToken?username={name}`
+- `http -a {application}:{secret} GET localhost:9000/facebook/users?username={name} password:{password}`
+- `http -a {application}:{secret} GET localhost:9000/facebook/photos?username={name} password:{password}`
+- `http -a {application}:{secret} GET localhost:9000/facebook/videos?username={name} password:{password}`
+- `http -a {application}:{secret} GET localhost:9000/facebook/extendedToken?username={name} password:{password}`
 - `http -a {application}:{secret} GET localhost:9000/facebook/oauthUrl`
-- `http -a {application}:{secret} -f POST "localhost:9000/facebook/publish?username={name}&type={type}" file@location/to/file message="Some message" title="Some title"`
+- `http -a {application}:{secret} -f POST "localhost:9000/facebook/publish?username={name}&type={type}" file@path/to/file message="Some Message" title="Some Title" password:{password}`
 
 ### Twitter
-- `http -a {application}:{secret} GET localhost:9000/twitter/users?username={name}`
+- `http -a {application}:{secret} GET localhost:9000/twitter/users?username={name} password:{password}`
 - `http -a {application}:{secret} GET localhost:9000/twitter/oauthUrl`

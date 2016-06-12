@@ -49,5 +49,4 @@ public class LightningConfiguration extends Configuration {
   public List<Key> getApprovedKeys() {
     return approvedKeys;
   }
-
 }

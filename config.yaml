@@ -1,15 +1,15 @@
 # Thunder Access
 thunder:
-  endpoint: http://localhost:8080
+  endpoint: http://thunder.sanctionco.com
   user-key: lightning
   user-secret: secret
 
 # Approved Authentication Credentials
 approved-keys:
-  - application: lightning
-    secret: secret
-  - application: lightning
-    secret: secret2
+  - application:
+    secret:
+  - application:
+    secret:
 
 # Application Auth Keys
 facebook:
