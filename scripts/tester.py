@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('Test runner for all Lightning endpoints')
 
     # Add command line args
-    parser.add_argument('-e', '--endpoint', type=str, default='http://lightning.sanctionco.com', help='the base endpoint to connect to')
+    parser.add_argument('-e', '--endpoint', type=str, default='http://localhost:9000', help='the base endpoint to connect to')
     parser.add_argument('-u', '--username', type=str, default='Testy', help='the Pilot username to fetch data for')
     parser.add_argument('-p', '--password', type=str, default='password', help='the password of this user')
     parser.add_argument('-v', '--verbosity', type=int, default=0, choices=set((0, 1)), help='0 = only success/failure. 1 = show HTTP response')
