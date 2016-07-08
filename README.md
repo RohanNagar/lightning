@@ -43,7 +43,26 @@ Submit a pull request to this repo with your changes as a single commit.
 Your changes will be reviewed and merged when appropriate.
 
 ## Testing
-You can run the following commands using [HTTPie](https://github.com/jkbrzt/httpie) to test each of the available endpoints. Simply replace the brackets with the appropriate information and run the command via the command line.
+There is a Python testing script available in the `scripts` directory. To run this script, make sure you are in the base lightning directory and run the following command.
+
+```bash
+$ python scripts/tester.py
+```
+
+There are multiple optional command line arguments for the testing script. These are described in the table below, along with their default values. Additionally, when running the script from the command line, adding the `-h` option will display a help message with all optional arguments.
+
+|        Flag        |                                                  Description                                                  |      Default Value      |
+|:------------------:|:-------------------------------------------------------------------------------------------------------------:|:-----------------------:|
+|    `-h` `--help`   |                                            Display a help message.                                            |           ----          |
+|  `-e` `--endpoint` |                                   The endpoint to connect to lightning with.                                  | `http://localhost:9000` |
+|  `-u` `--username` |                                       The username to make requests for.                                      |         `Testy`         |
+|  `-p` `--password` |              The password of the user that matches the username. Should not be a hashed password.             |        `password`       |
+|    `-a` `--auth`   |                   The basic authentication credentials in the form `{app_name}:{app_secret}`                  |    `lightning:secret`   |
+| `-v` `--verbosity` | Use a value of `0` to only show the success or failure message. Use a value of `1` to additionally show the JSON response. |           `0`           |
+
+When adding new endpoints to lightning, be sure to include a new `TestCase` for that endpoint in the `tester.py` script.
+
+Another testing option is to run the following commands using [HTTPie](https://github.com/jkbrzt/httpie). Simply replace the brackets with the appropriate information and run the command via the command line.
 
 ### Facebook
 - `http -a {application}:{secret} GET localhost:9000/facebook/users?username={name} password:{password}`
