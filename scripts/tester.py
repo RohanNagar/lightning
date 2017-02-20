@@ -4,6 +4,7 @@ import requests
 
 from pprint import pprint
 
+
 class Colors():
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -15,9 +16,10 @@ class Colors():
     UNDERLINE = '\033[4m'
 
 
-class TestCase():
+class TestCase:
 
-    def __init__(self, method, endpoint, auth, params=None, headers=None, files=None, data=None, expected=requests.codes.ok):
+    def __init__(self, method, endpoint, auth, params=None, headers=None, files=None, data=None,
+                 expected=requests.codes.ok):
         self.method = method
         self.endpoint = endpoint
         self.auth = auth
@@ -29,15 +31,21 @@ class TestCase():
 
     def run(self, base_url, verbosity=0):
         print(Colors.BOLD + self.method + ' ' + self.endpoint)
-        r = requests.request(self.method, base_url + self.endpoint, params=self.params, auth=self.auth, headers=self.headers,
-                files=self.files, data=self.data)
+        r = requests.request(self.method, base_url + self.endpoint,
+                             params=self.params,
+                             auth=self.auth,
+                             headers=self.headers,
+                             files=self.files,
+                             data=self.data)
 
         if r.status_code == self.expected:
             print(Colors.OKGREEN + 'SUCCESS' + Colors.ENDC)
             
             if verbosity == 1:
-                try: pprint(r.json())
-                except: print(r.text)
+                try:
+                    pprint(r.json())
+                except:
+                    print(r.text)
 
             print()
             return 0
