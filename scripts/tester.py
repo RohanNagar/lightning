@@ -5,7 +5,7 @@ import requests
 from pprint import pprint
 
 
-class Colors():
+class Colors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -17,7 +17,6 @@ class Colors():
 
 
 class TestCase:
-
     def __init__(self, method, endpoint, auth, params=None, headers=None, files=None, data=None,
                  expected=requests.codes.ok):
         self.method = method
@@ -79,11 +78,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser('Test runner for all Lightning endpoints')
 
     # Add command line args
-    parser.add_argument('-e', '--endpoint', type=str, default='http://localhost:9000', help='the base endpoint to connect to')
-    parser.add_argument('-u', '--username', type=str, default='Testy', help='the Pilot username to fetch data for')
-    parser.add_argument('-p', '--password', type=str, default='password', help='the password of this user')
-    parser.add_argument('-v', '--verbosity', type=int, default=0, choices=set((0, 1)), help='0 = only success/failure. 1 = show HTTP response')
-    parser.add_argument('-a', '--auth', type=str, default='lightning:secret', help='authentication credentials to connect to all endpoints')
+    parser.add_argument('-e', '--endpoint', type=str, default='http://localhost:9000',
+                        help='the base endpoint to connect to')
+    parser.add_argument('-u', '--username', type=str, default='testy@gmail.com',
+                        help='the Pilot username to fetch data for')
+    parser.add_argument('-p', '--password', type=str, default='password',
+                        help='the password of this user')
+    parser.add_argument('-v', '--verbosity', type=int, default=0, choices={0, 1},
+                        help='0 = only success/failure. 1 = show HTTP response')
+    parser.add_argument('-a', '--auth', type=str, default='application:secret',
+                        help='authentication credentials to connect to all endpoints')
     args = parser.parse_args()
 
     # Hash password
@@ -91,23 +95,35 @@ if __name__ == '__main__':
     m.update(args.password.encode('utf-8'))
     password = m.hexdigest()
 
-    # Seperate auth
+    # Separate auth
     auth = (args.auth.split(':')[0], args.auth.split(':')[1])
 
     # Define test cases
     tests = [
         # Facebook
-        TestCase('GET', '/facebook/users', auth, params={'username': args.username}, headers={'password': password}),
-        TestCase('GET', '/facebook/photos', auth, params={'username': args.username}, headers={'password': password}),
-        TestCase('GET', '/facebook/videos', auth, params={'username': args.username}, headers={'password': password}),
-        TestCase('GET', '/facebook/extendedToken', auth, params={'username': args.username}, headers={'password': password}),
         TestCase('GET', '/facebook/oauthUrl', auth),
-        TestCase('POST', '/facebook/publish', auth, params={'username': args.username, 'type': 'photo'}, headers={'password': password},
-            files={'file': open('application/src/main/resources/logo.png', 'rb')}, data={'message': 'Lightning Logo', 'title': 'Logo'}),
+        TestCase('GET', '/facebook/users', auth,
+                 params={'username': args.username},
+                 headers={'password': password}),
+        TestCase('GET', '/facebook/photos', auth,
+                 params={'username': args.username},
+                 headers={'password': password}),
+        TestCase('GET', '/facebook/videos', auth,
+                 params={'username': args.username},
+                 headers={'password': password}),
+        TestCase('GET', '/facebook/extendedToken', auth,
+                 params={'username': args.username},
+                 headers={'password': password}),
+        TestCase('POST', '/facebook/publish', auth,
+                 params={'username': args.username, 'type': 'photo'},
+                 headers={'password': password},
+                 files={'file': open('application/src/main/resources/logo.png', 'rb')},
+                 data={'message': 'Lightning Logo', 'title': 'Logo'}),
 
         # Twitter
-        TestCase('GET', '/twitter/users', auth, params={'username': args.username}, headers={'password': password}),
         TestCase('GET', '/twitter/oauthUrl', auth),
+        TestCase('GET', '/twitter/users', auth, params={'username': args.username},
+                 headers={'password': password}),
     ]
 
     # Run tests
