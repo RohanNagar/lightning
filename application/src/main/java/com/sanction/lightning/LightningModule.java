@@ -2,7 +2,6 @@ package com.sanction.lightning;
 
 import com.codahale.metrics.MetricRegistry;
 import com.sanction.lightning.authentication.LightningAuthenticator;
-import com.sanction.lightning.config.ThunderConfiguration;
 import com.sanction.thunder.ThunderClient;
 import dagger.Module;
 import dagger.Provides;

@@ -52,23 +52,23 @@ public class TwitterResource {
   }
 
   /**
-   * Retrieves a TwitterUser object for a given PilotUser username.
+   * Retrieves a TwitterUser object for a given PilotUser.
    *
    * @param key The authentication credentials of the calling application.
-   * @param username The username of the PilotUser to find Twitter User information for.
-   * @param password The password of the PilotUser to find Twitter User information for.
-   * @return The TwitterUser object if successful.
+   * @param email The email of the PilotUser to find Twitter information for.
+   * @param password The password of the PilotUser.
+   * @return The TwitterUser object, if successful.
    */
   @GET
   @Path("/users")
   public Response getUser(@Auth Key key,
-                          @QueryParam("username") String username,
+                          @QueryParam("email") String email,
                           @HeaderParam("password") String password) {
     usersRequests.mark();
 
-    if (username == null) {
+    if (email == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'username' query parameter is required.").build();
+          .entity("The 'email' query parameter is required to get a Twitter user.").build();
     }
 
     if (password == null || password.equals("")) {
@@ -76,7 +76,7 @@ public class TwitterResource {
           .entity("Incorrect or missing header credentials.").build();
     }
 
-    PilotUser pilotUser = thunderClient.getUser(password, username);
+    PilotUser pilotUser = thunderClient.getUser(email, password);
     TwitterService service = twitterServiceFactory.newTwitterService(
         pilotUser.getTwitterAccessToken(),
         pilotUser.getTwitterAccessSecret());
@@ -94,7 +94,7 @@ public class TwitterResource {
    * Generates a Twitter URL that can be used to authenticate a PilotUser.
    *
    * @param key The authentication credentials of the calling application.
-   * @return The URL to send the user to if successful.
+   * @return The application authentication URL, if successful.
    */
   @GET
   @Path("/oauthUrl")

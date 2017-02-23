@@ -86,23 +86,23 @@ public class FacebookResource {
   }
 
   /**
-   * Retrieves a FacebookUser object for the requested PilotUser username.
+   * Retrieves a FacebookUser object for the requested PilotUser.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The username of the PilotUser to get information for.
+   * @param email The email of the PilotUser to get information for.
    * @param password The password of the PilotUser of get information for.
-   * @return The FacebookUser object corresponding to the PilotUser username.
+   * @return The FacebookUser object corresponding to the given PilotUser.
    */
   @GET
   @Path("/users")
   public Response getUser(@Auth Key key,
-                          @QueryParam("username") String username,
+                          @QueryParam("email") String email,
                           @HeaderParam("password") String password) {
     usersRequests.mark();
 
-    if (username == null) {
+    if (email == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'username' query parameter is required for getUser").build();
+          .entity("The 'email' query parameter is required to get a Facebook user.").build();
     }
 
     if (password == null || password.equals("")) {
@@ -112,9 +112,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = getPilotUser(username, password);
+      pilotUser = getPilotUser(email, password);
     } catch (ThunderConnectionException e) {
-      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
@@ -125,7 +125,7 @@ public class FacebookResource {
     try {
       facebookUser = facebookService.getFacebookUser();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}.", username, e);
+      LOG.error("Bad Facebook OAuth token for username {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
@@ -134,24 +134,24 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches all the photos for the requested PilotUser username.
+   * Fetches all the photos for the requested PilotUser.
    * This method does not download the actual bytes of the photos.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The username of the PilotUser to get photos for.
-   * @param password The password of the PilotUser of get information for.
+   * @param email The email of the PilotUser to get photos for.
+   * @param password The password of the PilotUser.
    * @return A list of the photos that the user has on Facebook.
    */
   @GET
   @Path("/photos")
   public Response getPhotos(@Auth Key key,
-                            @QueryParam("username") String username,
+                            @QueryParam("email") String email,
                             @HeaderParam("password") String password) {
     photosRequests.mark();
 
-    if (username == null) {
+    if (email == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'username' query parameter is required for getPhotos").build();
+          .entity("The 'email' query parameter is required to get Facebook photos.").build();
     }
 
     if (password == null || password.equals("")) {
@@ -161,9 +161,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = getPilotUser(username, password);
+      pilotUser = getPilotUser(email, password);
     } catch (ThunderConnectionException e) {
-      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
@@ -174,7 +174,7 @@ public class FacebookResource {
     try {
       photoList = facebookService.getFacebookUserPhotos();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}.", username, e);
+      LOG.error("Bad Facebook OAuth token for email {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
@@ -186,19 +186,19 @@ public class FacebookResource {
    * Publishes to a user's Facebook timeline.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The username of the PilotUser to upload to.
-   * @param password The password of the PilotUser of get information for.
-   * @param inputStream The inputStream for the file to upload.
+   * @param email The email of the PilotUser to upload as.
+   * @param password The password of the PilotUser.
+   * @param inputStream The inputStream for the file to be upload.
    * @param contentDispositionHeader Additional information about the file to upload.
-   * @param type The type of file passed in ("photo" or "video").
-   * @param message The message to post the user's timeline with the luded file.
+   * @param type The type of file passed in - either "photo" or "video".
+   * @param message The message to post the user's timeline with the included file.
    * @return The uploaded file information if the request was successful.
    */
   @POST
   @Path("/publish")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   public Response publish(@Auth Key key,
-                          @QueryParam("username") String username,
+                          @QueryParam("email") String email,
                           @HeaderParam("password") String password,
                           @FormDataParam("file") InputStream inputStream,
                           @FormDataParam("file") FormDataContentDisposition
@@ -208,9 +208,9 @@ public class FacebookResource {
                           @FormDataParam("title") @DefaultValue("") String videoTitle) {
     publishRequests.mark();
 
-    if (username == null) {
+    if (email == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'username' query parameter is required for publish").build();
+          .entity("The 'email' query parameter is required to publish to Facebook.").build();
     }
 
     if (password == null || password.equals("")) {
@@ -220,24 +220,24 @@ public class FacebookResource {
 
     if (type == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'type' query parameter is required for publish").build();
+          .entity("The 'type' query parameter is required to publish to Facebook.").build();
     }
 
     if (!type.equals("photo") && !type.equals("video")) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'type' query parameter must be 'photo' or 'video'").build();
+          .entity("The 'type' query parameter must be either 'photo' or 'video'.").build();
     }
 
     if (inputStream == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'file' is required for publish").build();
+          .entity("A file is required to publish.").build();
     }
 
     PilotUser pilotUser;
     try {
-      pilotUser = getPilotUser(username, password);
+      pilotUser = getPilotUser(email, password);
     } catch (ThunderConnectionException e) {
-      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
@@ -248,7 +248,7 @@ public class FacebookResource {
         contentDispositionHeader.getFileName(), message, videoTitle);
 
     if (uploadedFile == null) {
-      LOG.error("Error uploading to Facebook for username {}.", username);
+      LOG.error("Error uploading to Facebook for username {}.", email);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
           .entity("Error uploading to Facebook.").build();
     }
@@ -257,24 +257,24 @@ public class FacebookResource {
   }
 
   /**
-   * Fetches all the videos for the requested PilotUser username.
+   * Fetches all the videos for the requested PilotUser.
    * This method does not download the actual bytes of the videos.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The username of the PilotUser to get videos for.
-   * @param password The password of the PilotUser of get information for.
+   * @param email The email of the PilotUser to get videos for.
+   * @param password The password of the PilotUser.
    * @return A list of the videos that the user has on Facebook.
    */
   @GET
   @Path("/videos")
   public Response getVideos(@Auth Key key,
-                            @QueryParam("username") String username,
+                            @QueryParam("email") String email,
                             @HeaderParam("password") String password) {
     videosRequests.mark();
 
-    if (username == null) {
+    if (email == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'username' query parameter is required for getUser").build();
+          .entity("The 'email' query parameter is required to get videos.").build();
     }
 
     if (password == null || password.equals("")) {
@@ -284,9 +284,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = getPilotUser(username, password);
+      pilotUser = getPilotUser(email, password);
     } catch (ThunderConnectionException e) {
-      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
@@ -297,7 +297,7 @@ public class FacebookResource {
     try {
       videoList = facebookService.getFacebookUserVideos();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}.", username, e);
+      LOG.error("Bad Facebook OAuth token for email {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
@@ -309,20 +309,20 @@ public class FacebookResource {
    * Fetches an extended Facebook access token for the PilotUser.
    *
    * @param key The authentication key for the requesting application.
-   * @param username The name of the PilotUser to fetch an extended token for.
-   * @param password The password of the PilotUser of get information for.
+   * @param email The PilotUser to fetch an extended token for.
+   * @param password The password of the PilotUser.
    * @return The extended Facebook access token.
    */
   @GET
   @Path("/extendedToken")
   public Response getExtendedToken(@Auth Key key,
-                                   @QueryParam("username") String username,
+                                   @QueryParam("email") String email,
                                    @HeaderParam("password") String password) {
     tokenRequests.mark();
 
-    if (username == null) {
+    if (email == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("'username' query parameter is required").build();
+          .entity("The 'email' query parameter is required to extend a token.").build();
     }
 
     if (password == null || password.equals("")) {
@@ -332,9 +332,9 @@ public class FacebookResource {
 
     PilotUser pilotUser;
     try {
-      pilotUser = getPilotUser(username, password);
+      pilotUser = getPilotUser(email, password);
     } catch (ThunderConnectionException e) {
-      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", username);
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
@@ -345,19 +345,19 @@ public class FacebookResource {
     try {
       extendedToken = facebookService.getFacebookExtendedToken();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth Token for username {}.", username, e);
+      LOG.error("Bad Facebook OAuth Token for email {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
     // Set up the PilotUser with the extended token
-    pilotUser = new PilotUser(pilotUser.getUsername(), pilotUser.getPassword(), extendedToken,
+    pilotUser = new PilotUser(pilotUser.getEmail(), pilotUser.getPassword(), extendedToken,
         pilotUser.getTwitterAccessSecret(), pilotUser.getTwitterAccessSecret());
 
     try {
-      thunderClient.updateUser(password, pilotUser);
+      thunderClient.updateUser(pilotUser, password);
     } catch (RetrofitError e) {
-      LOG.error("Unable to update PilotUser ({}) through Thunder.", username, e);
+      LOG.error("Unable to update PilotUser ({}) through Thunder.", email, e);
       return Response.status(e.getResponse().getStatus())
           .entity(e.getResponse().getReason())
           .build();
@@ -392,11 +392,11 @@ public class FacebookResource {
     return Response.ok(permissionsUrl).build();
   }
 
-  private PilotUser getPilotUser(String username, String password) {
+  private PilotUser getPilotUser(String email, String password) {
     PilotUser pilotUser;
 
     try {
-      pilotUser = thunderClient.getUser(password, username);
+      pilotUser = thunderClient.getUser(email, password);
     } catch (RetrofitError e) {
       // If the error has a null response, then Thunder is down.
       if (e.getResponse() == null) {
@@ -408,7 +408,7 @@ public class FacebookResource {
       }
 
       // If unauthorized, the API keys are incorrect - Internal Server Error.
-      if (e.getResponse().getStatus() == 401) {
+      if (e.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
         LOG.error("Incorrect API Keys to access Thunder.");
         throw new ThunderConnectionException(
             Response.status(Response.Status.INTERNAL_SERVER_ERROR)

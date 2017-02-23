@@ -1,5 +1,6 @@
 import argparse
 import hashlib
+import json
 import requests
 
 from pprint import pprint
@@ -28,7 +29,7 @@ class TestCase:
         self.data = data
         self.expected = expected
 
-    def run(self, base_url, verbosity=0):
+    def run(self, base_url, verbose=False):
         print(Colors.BOLD + self.method + ' ' + self.endpoint)
         r = requests.request(self.method, base_url + self.endpoint,
                              params=self.params,
@@ -40,10 +41,10 @@ class TestCase:
         if r.status_code == self.expected:
             print(Colors.OKGREEN + 'SUCCESS' + Colors.ENDC)
             
-            if verbosity == 1:
+            if verbose:
                 try:
                     pprint(r.json())
-                except:
+                except json.decoder.JSONDecodeError:
                     print(r.text)
 
             print()
@@ -51,7 +52,7 @@ class TestCase:
         else:
             print(Colors.FAIL + 'FAILURE' + Colors.ENDC)
 
-            if verbosity == 1:
+            if verbose:
                 print(r.text)
 
             print()
@@ -59,13 +60,13 @@ class TestCase:
 
 
 # Runs all TestCase objects in the tests parameter
-def run_all(tests, base_url, verbosity=0):
+def run_all(tests, base_url, verbose=False):
     failures = 0
    
     # Each run will return a 0 on success and a 1 on failure
     # Summing will get the number of failures
     for test in tests:
-        failures += test.run(base_url, verbosity)
+        failures += test.run(base_url, verbose)
 
     print(Colors.BOLD + '-----------------------------------')
     if failures > 0:
@@ -80,14 +81,14 @@ if __name__ == '__main__':
     # Add command line args
     parser.add_argument('-e', '--endpoint', type=str, default='http://localhost:9000',
                         help='the base endpoint to connect to')
-    parser.add_argument('-u', '--username', type=str, default='testy@gmail.com',
-                        help='the Pilot username to fetch data for')
+    parser.add_argument('-m', '--email', type=str, default='testy@gmail.com',
+                        help='the email of the Pilot user to fetch data for')
     parser.add_argument('-p', '--password', type=str, default='password',
                         help='the password of this user')
-    parser.add_argument('-v', '--verbosity', type=int, default=0, choices={0, 1},
-                        help='0 = only success/failure. 1 = show HTTP response')
     parser.add_argument('-a', '--auth', type=str, default='application:secret',
                         help='authentication credentials to connect to all endpoints')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='increase output verbosity')
     args = parser.parse_args()
 
     # Hash password
@@ -96,35 +97,36 @@ if __name__ == '__main__':
     password = m.hexdigest()
 
     # Separate auth
-    auth = (args.auth.split(':')[0], args.auth.split(':')[1])
+    authentication = (args.auth.split(':')[0], args.auth.split(':')[1])
 
     # Define test cases
-    tests = [
+    all_tests = [
         # Facebook
-        TestCase('GET', '/facebook/oauthUrl', auth),
-        TestCase('GET', '/facebook/users', auth,
-                 params={'username': args.username},
+        TestCase('GET', '/facebook/oauthUrl', authentication),
+        TestCase('GET', '/facebook/users', authentication,
+                 params={'email': args.email},
                  headers={'password': password}),
-        TestCase('GET', '/facebook/photos', auth,
-                 params={'username': args.username},
+        TestCase('GET', '/facebook/photos', authentication,
+                 params={'email': args.email},
                  headers={'password': password}),
-        TestCase('GET', '/facebook/videos', auth,
-                 params={'username': args.username},
+        TestCase('GET', '/facebook/videos', authentication,
+                 params={'email': args.email},
                  headers={'password': password}),
-        TestCase('GET', '/facebook/extendedToken', auth,
-                 params={'username': args.username},
+        TestCase('GET', '/facebook/extendedToken', authentication,
+                 params={'email': args.email},
                  headers={'password': password}),
-        TestCase('POST', '/facebook/publish', auth,
-                 params={'username': args.username, 'type': 'photo'},
+        TestCase('POST', '/facebook/publish', authentication,
+                 params={'email': args.email, 'type': 'photo'},
                  headers={'password': password},
                  files={'file': open('application/src/main/resources/logo.png', 'rb')},
                  data={'message': 'Lightning Logo', 'title': 'Logo'}),
 
         # Twitter
-        TestCase('GET', '/twitter/oauthUrl', auth),
-        TestCase('GET', '/twitter/users', auth, params={'username': args.username},
+        TestCase('GET', '/twitter/oauthUrl', authentication),
+        TestCase('GET', '/twitter/users', authentication,
+                 params={'email': args.email},
                  headers={'password': password}),
     ]
 
     # Run tests
-    run_all(tests, args.endpoint, verbosity=args.verbosity)
+    run_all(all_tests, args.endpoint, verbose=args.verbose)

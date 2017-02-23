@@ -46,7 +46,7 @@ public class TwitterResourceTest {
 
   /* User Tests */
   @Test
-  public void testGetUserWithNullUsername() {
+  public void testGetUserWithNullEmail() {
     Response response = resource.getUser(key, null, "password");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
