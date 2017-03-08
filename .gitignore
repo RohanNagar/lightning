@@ -19,3 +19,6 @@ target/
 
 # Temporary Maven files
 dependency-reduced-pom.xml
+
+# Log files
+var/log/

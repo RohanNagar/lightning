@@ -18,7 +18,7 @@ twitter:
   app-key: FYd4qK3yLdGs6BQ4BaaqfkDSJ
   app-secret: aS2zYpyH9ddtyt5UHoCnu125wFPEY3maLvNKg4dsHWTEqomeRn
 
-# Server Configuration
+# Application Configuration
 server:
   applicationConnectors:
     - type: http
@@ -26,3 +26,15 @@ server:
   adminConnectors:
     - type: http
       port: 9001
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: var/log/lightning-requests.log
+        archivedLogFilenamePattern: var/log/lightning-requests-%d.log
+
+logging:
+  level: INFO
+  appenders:
+    - type: file
+      currentLogFilename: var/log/lightning.log
+      archivedLogFilenamePattern: var/log/lightning-%d.log
