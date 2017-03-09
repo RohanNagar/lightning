@@ -6,11 +6,12 @@
 [![Version](https://img.shields.io/badge/version-v0.1.0-7f8c8d.svg)](https://github.com/RohanNagar/lightning/releases)
 [![Twitter](https://img.shields.io/badge/twitter-%40RohanNagar22-00aced.svg)](http://twitter.com/RohanNagar22)
 
-Lightning is a real-time social media REST API, to be used in conjunction with [Thunder](https://github.com/RohanNagar/thunder). Lightning provides methods to request data from various 3rd party social media services, including Facebook and Twitter.
+Lightning is a real-time social media REST API, to be used in conjunction with [Thunder](https://github.com/RohanNagar/thunder). Lightning provides methods to request data from various 3rd party social media and cloud services, including Facebook and Twitter.
 
+* [Endpoints](https://github.com/RohanNagar/lightning/wiki/Available-Endpoints)
 * [Running Locally](#running-locally)
-* [Contributing](#contributing)
 * [Testing](#testing)
+* [Changelog](https://github.com/RohanNagar/lightning/wiki/Changelog)
 
 ## Running Locally
 - Requirements
@@ -37,11 +38,6 @@ $ java -jar application/target/application-*.jar server
 
 Lightning should now be running on localhost port 9000.
 
-## Contributing
-Make changes to your local repository and push them up to your fork on GitHub.
-Submit a pull request to this repo with your changes as a single commit.
-Your changes will be reviewed and merged when appropriate.
-
 ## Testing
 There is a Python testing script available in the `scripts` directory. To run this script, make sure you are in the base lightning directory and run the following command.
 
@@ -55,23 +51,11 @@ There are multiple optional command line arguments for the testing script. These
 |:------------------:|:-------------------------------------------------------------------------------------------------------------:|:-----------------------:|
 |    `-h` `--help`   |                                            Display a help message.                                            |           ----          |
 |  `-e` `--endpoint` |                                   The endpoint to connect to lightning with.                                  | `http://localhost:9000` |
-|  `-u` `--username` |                                       The username to make requests for.                                      |         `Testy`         |
+|   `-m` `--email`   |                                        The email to make requests for.                                        |    `testy@gmail.com`    |
 |  `-p` `--password` |              The password of the user that matches the username. Should not be a hashed password.             |        `password`       |
-|    `-a` `--auth`   |                   The basic authentication credentials in the form `{app_name}:{app_secret}`                  |    `lightning:secret`   |
-| `-v` `--verbosity` | Use a value of `0` to only show the success or failure message. Use a value of `1` to additionally show the JSON response. |           `0`           |
+|    `-a` `--auth`   |                   The basic authentication credentials in the form `{app_name}:{app_secret}`                  |   `application:secret`  |
+|  `-v` `--verbose`  |                                        Provide more output information.                                       |         `False`         |
 
 When adding new endpoints to lightning, be sure to include a new `TestCase` for that endpoint in the `tester.py` script.
 
-Another testing option is to run the following commands using [HTTPie](https://github.com/jkbrzt/httpie). Simply replace the brackets with the appropriate information and run the command via the command line.
-
-### Facebook
-- `http -a {application}:{secret} GET localhost:9000/facebook/users?username={name} password:{password}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/photos?username={name} password:{password}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/videos?username={name} password:{password}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/extendedToken?username={name} password:{password}`
-- `http -a {application}:{secret} GET localhost:9000/facebook/oauthUrl`
-- `http -a {application}:{secret} -f POST "localhost:9000/facebook/publish?username={name}&type={type}" file@path/to/file message="Some Message" title="Some Title" password:{password}`
-
-### Twitter
-- `http -a {application}:{secret} GET localhost:9000/twitter/users?username={name} password:{password}`
-- `http -a {application}:{secret} GET localhost:9000/twitter/oauthUrl`
+Another testing option is to use [HTTPie](https://github.com/jkbrzt/httpie). See the [wiki](https://github.com/RohanNagar/lightning/wiki/HTTPie-Testing-Commands) for each individual command.
