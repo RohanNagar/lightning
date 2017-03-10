@@ -1,7 +1,7 @@
 # Thunder Access
 thunder:
   endpoint: http://localhost:8080
-  user-key: lightning
+  user-key: application
   user-secret: secret
 
 # Approved Authentication Credentials
@@ -26,15 +26,3 @@ server:
   adminConnectors:
     - type: http
       port: 9001
-  requestLog:
-    appenders:
-      - type: file
-        currentLogFilename: var/log/lightning-requests.log
-        archivedLogFilenamePattern: var/log/lightning-requests-%d.log
-
-logging:
-  level: INFO
-  appenders:
-    - type: file
-      currentLogFilename: var/log/lightning.log
-      archivedLogFilenamePattern: var/log/lightning-%d.log
