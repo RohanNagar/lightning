@@ -20,7 +20,7 @@ public class FacebookModule {
    */
   @Singleton
   @Provides
-  public FacebookServiceFactory provideFacebookServiceFactory() {
+  FacebookServiceFactory provideFacebookServiceFactory() {
     return new FacebookServiceFactory(
         facebookConfiguration.getAppId(),
         facebookConfiguration.getAppSecret());

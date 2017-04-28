@@ -1,7 +1,7 @@
 # Thunder Access
 thunder:
-  endpoint: http://localhost:8080
-  user-key: application
+  endpoint: http://thunder.nickeckert.com
+  user-key: lightning
   user-secret: secret
 
 # Approved Authentication Credentials
@@ -11,12 +11,16 @@ approved-keys:
 
 # Application Auth Keys
 facebook:
-  app-id: 896501930437172
-  app-secret: 303d6076cc840d8e7bc5d36b2cb9fbc6
+  app-id:
+  app-secret:
 
 twitter:
-  app-key: FYd4qK3yLdGs6BQ4BaaqfkDSJ
-  app-secret: aS2zYpyH9ddtyt5UHoCnu125wFPEY3maLvNKg4dsHWTEqomeRn
+  app-key:
+  app-secret:
+
+dropbox:
+  app-key:
+  app-secret:
 
 # Application Configuration
 server:

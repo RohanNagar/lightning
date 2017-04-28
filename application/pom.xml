@@ -63,6 +63,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.dropbox.core</groupId>
+      <artifactId>dropbox-core-sdk</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.dagger</groupId>
       <artifactId>dagger</artifactId>
     </dependency>

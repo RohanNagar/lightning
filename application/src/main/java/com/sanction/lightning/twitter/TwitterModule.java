@@ -20,7 +20,7 @@ public class TwitterModule {
    */
   @Singleton
   @Provides
-  public TwitterServiceFactory provideTwitterServiceFactory() {
+  TwitterServiceFactory provideTwitterServiceFactory() {
     return new TwitterServiceFactory(
         twitterConfiguration.getAppKey(),
         twitterConfiguration.getAppSecret());

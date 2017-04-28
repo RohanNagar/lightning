@@ -3,6 +3,7 @@ package com.sanction.lightning;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.sanction.lightning.config.ThunderConfiguration;
+import com.sanction.lightning.dropbox.DropboxConfiguration;
 import com.sanction.lightning.facebook.FacebookConfiguration;
 import com.sanction.lightning.resources.FacebookResource;
 import com.sanction.lightning.resources.TwitterResource;
@@ -36,6 +37,7 @@ public class LightningApplicationTest {
 
   private final LightningConfiguration config = mock(LightningConfiguration.class);
   private final ThunderConfiguration thunderConfig = mock(ThunderConfiguration.class);
+  private final DropboxConfiguration dropboxConfig = mock(DropboxConfiguration.class);
   private final FacebookConfiguration facebookConfig = mock(FacebookConfiguration.class);
   private final TwitterConfiguration twitterConfig = mock(TwitterConfiguration.class);
 
@@ -50,6 +52,7 @@ public class LightningApplicationTest {
     // LightningConfiguration fields
     when(config.getApprovedKeys()).thenReturn(new ArrayList<>());
     when(config.getThunderConfiguration()).thenReturn(thunderConfig);
+    when(config.getDropboxConfiguration()).thenReturn(dropboxConfig);
     when(config.getFacebookConfiguration()).thenReturn(facebookConfig);
     when(config.getTwitterConfiguration()).thenReturn(twitterConfig);
 

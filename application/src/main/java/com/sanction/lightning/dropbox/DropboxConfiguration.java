@@ -1,9 +1,9 @@
-package com.sanction.lightning.twitter;
+package com.sanction.lightning.dropbox;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
-public class TwitterConfiguration {
+public class DropboxConfiguration {
 
   @NotEmpty
   @JsonProperty("app-key")

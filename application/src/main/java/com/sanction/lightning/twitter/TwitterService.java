@@ -12,6 +12,9 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterService {
   private static final Logger LOG = LoggerFactory.getLogger(TwitterService.class);
 
+  // TODO: replace redirect URL
+  private static final String REDIRECT_URL = "http://example.com";
+
   private final Twitter twitterClient;
 
   /**
@@ -81,11 +84,10 @@ public class TwitterService {
    */
   public String getAuthorizationUrl() {
     try {
-      return twitterClient.getOAuthRequestToken("example.com").getAuthorizationURL();
+      return twitterClient.getOAuthRequestToken(REDIRECT_URL).getAuthorizationURL();
     } catch (TwitterException e) {
       LOG.error("Unable to get authorization URL from Twitter. "
           + "Twitter error code: {}", e.getErrorCode(), e);
-      // TODO: replace redirect URL
       return null;
     }
   }

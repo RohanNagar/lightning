@@ -13,11 +13,11 @@ public class FacebookConfiguration {
   @JsonProperty("app-secret")
   private final String appSecret = null;
 
-  public String getAppId() {
+  String getAppId() {
     return appId;
   }
 
-  public String getAppSecret() {
+  String getAppSecret() {
     return appSecret;
   }
 }

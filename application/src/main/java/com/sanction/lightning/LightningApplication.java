@@ -1,6 +1,7 @@
 package com.sanction.lightning;
 
 import com.sanction.lightning.authentication.Key;
+import com.sanction.lightning.dropbox.DropboxModule;
 import com.sanction.lightning.facebook.FacebookModule;
 import com.sanction.lightning.twitter.TwitterModule;
 import com.sanction.thunder.ThunderBuilder;
@@ -35,6 +36,7 @@ public class LightningApplication extends Application<LightningConfiguration> {
     ThunderClient thunderClient = thunderBuilder.newThunderClient();
 
     LightningComponent component = DaggerLightningComponent.builder()
+        .dropboxModule(new DropboxModule(config.getDropboxConfiguration()))
         .facebookModule(new FacebookModule(config.getFacebookConfiguration()))
         .lightningModule(new LightningModule(thunderClient, config, env.metrics()))
         .twitterModule(new TwitterModule(config.getTwitterConfiguration()))
@@ -49,6 +51,7 @@ public class LightningApplication extends Application<LightningConfiguration> {
     env.jersey().register(new AuthValueFactoryProvider.Binder<>(Key.class));
 
     // Resources
+    env.jersey().register(component.getDropboxResource());
     env.jersey().register(component.getFacebookResource());
     env.jersey().register(component.getTwitterResource());
   }
