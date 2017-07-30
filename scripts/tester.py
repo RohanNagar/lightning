@@ -81,7 +81,7 @@ if __name__ == '__main__':
     # Add command line args
     parser.add_argument('-e', '--endpoint', type=str, default='http://localhost:9000',
                         help='the base endpoint to connect to')
-    parser.add_argument('-m', '--email', type=str, default='testy@gmail.com',
+    parser.add_argument('-m', '--email', type=str, default='Testy@gmail.com',
                         help='the email of the Pilot user to fetch data for')
     parser.add_argument('-p', '--password', type=str, default='password',
                         help='the password of this user')
@@ -119,10 +119,14 @@ if __name__ == '__main__':
                  params={'email': args.email},
                  headers={'password': password}),
         TestCase('POST', '/facebook/publish', authentication,
-                 params={'email': args.email, 'type': 'photo'},
+                 params={'email': args.email, 'type': 'photo', 'message': 'Lightning Logo'},
                  headers={'password': password},
                  files={'file': open('application/src/main/resources/logo.png', 'rb')},
-                 data={'message': 'Lightning Logo', 'title': 'Logo'}),
+                 data={'title': 'Logo'}),
+        TestCase('POST', '/facebook/publish', authentication,
+                 params={'email': args.email, 'type': 'text', 'message': 'Hello World!'},
+                 headers={'password': password},
+                 files={'file': ''}),
 
         # Twitter
         TestCase('GET', '/twitter/oauthUrl', authentication),

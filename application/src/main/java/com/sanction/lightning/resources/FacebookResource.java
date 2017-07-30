@@ -10,6 +10,7 @@ import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
+import com.sanction.lightning.models.facebook.PublishType;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
@@ -188,10 +189,11 @@ public class FacebookResource {
    * @param key The authentication key for the requesting application.
    * @param email The email of the PilotUser to upload as.
    * @param password The password of the PilotUser.
+   * @param type The type of the publish to perform.
+   * @param message The text message to publish.
    * @param inputStream The inputStream for the file to be upload.
    * @param contentDispositionHeader Additional information about the file to upload.
-   * @param type The type of file passed in - either "photo" or "video".
-   * @param message The message to post the user's timeline with the included file.
+   * @param videoTitle If publishing a video, the title to attach to the video.
    * @return The uploaded file information if the request was successful.
    */
   @POST
@@ -200,11 +202,11 @@ public class FacebookResource {
   public Response publish(@Auth Key key,
                           @QueryParam("email") String email,
                           @HeaderParam("password") String password,
+                          @QueryParam("type") String type,
+                          @QueryParam("message") String message,
                           @FormDataParam("file") InputStream inputStream,
                           @FormDataParam("file") FormDataContentDisposition
                               contentDispositionHeader,
-                          @QueryParam("type") String type,
-                          @FormDataParam("message") @DefaultValue("") String message,
                           @FormDataParam("title") @DefaultValue("") String videoTitle) {
     publishRequests.mark();
 
@@ -223,14 +225,21 @@ public class FacebookResource {
           .entity("The 'type' query parameter is required to publish to Facebook.").build();
     }
 
-    if (!type.equals("photo") && !type.equals("video")) {
+    PublishType publishType = PublishType.fromString(type);
+    if (publishType == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'type' query parameter must be either 'photo' or 'video'.").build();
+          .entity("The 'type' query parameter must be either 'photo', 'video', or 'text'.").build();
     }
 
-    if (inputStream == null) {
+    if ((publishType.equals(PublishType.PHOTO) || publishType.equals(PublishType.VIDEO))
+        && inputStream == null) {
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("A file is required to publish.").build();
+          .entity("A file is required to publish a photo or video.").build();
+    }
+
+    if (publishType.equals(PublishType.TEXT) && (message == null || message.equals(""))) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Posting a text message requires the 'message' parameter.").build();
     }
 
     PilotUser pilotUser;
@@ -244,7 +253,7 @@ public class FacebookResource {
     FacebookService facebookService =
         facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
-    String uploadedFile = facebookService.publishToFacebook(inputStream, type,
+    String uploadedFile = facebookService.publishToFacebook(inputStream, publishType,
         contentDispositionHeader.getFileName(), message, videoTitle);
 
     if (uploadedFile == null) {

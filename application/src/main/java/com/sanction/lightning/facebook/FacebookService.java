@@ -19,6 +19,7 @@ import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookPhotoDetail;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
+import com.sanction.lightning.models.facebook.PublishType;
 
 import java.io.InputStream;
 import java.util.List;
@@ -103,33 +104,58 @@ public class FacebookService {
    * Publishes a photo or video to Facebook.
    *
    * @param inputStream The InputStream of the file to upload to Facebook.
-   * @param type The type to upload. Should be either "photo" or "video"
+   * @param type The type to upload to perform.
    * @param fileName The name to call the file on Facebook.
-   * @param message The caption for the photo or video.
+   *                 Will be ignored if only publishing text.
+   * @param message The text to publish.
    * @param videoTitle The title of the video if uploading a video.
-   *                   Will be ignored when uploading a photo.
+   *                   Will be ignored when uploading anything else.
    * @return A String of JSON with returned information if successful, or {@code null} on failure.
    */
-  public String publishToFacebook(InputStream inputStream, String type, String fileName,
+  public String publishToFacebook(InputStream inputStream, PublishType type, String fileName,
                                   String message, String videoTitle) {
     List<Parameter> parameters = Lists.newArrayList();
-
-    if (type.equals("photo")) {
-      parameters.add(Parameter.with("message", message));
-    } else {
-      parameters.add(Parameter.with("description", message));
-      parameters.add(Parameter.with("title", videoTitle));
-    }
+    String endpoint = "me/";
 
     JsonObject response;
 
     try {
-      response = client.publish("me/" + type + "s", JsonObject.class,
-          BinaryAttachment.with(fileName, inputStream),
-          parameters.toArray(new Parameter[parameters.size()]));
+      switch (type) {
+        case TEXT:
+          parameters.add(Parameter.with("message", message));
+          endpoint += "feed";
+
+          response = client.publish(endpoint, JsonObject.class,
+              Parameter.with("message", message));
+          break;
+
+        case PHOTO:
+          parameters.add(Parameter.with("message", message));
+          endpoint += "photos";
+
+          response = client.publish(endpoint, JsonObject.class,
+              BinaryAttachment.with(fileName, inputStream),
+              parameters.toArray(new Parameter[parameters.size()]));
+          break;
+
+        case VIDEO:
+          parameters.add(Parameter.with("description", message));
+          parameters.add(Parameter.with("title", videoTitle));
+          endpoint += "videos";
+
+          response = client.publish(endpoint, JsonObject.class,
+              BinaryAttachment.with(fileName, inputStream),
+              parameters.toArray(new Parameter[parameters.size()]));
+          break;
+
+        default:
+          // TODO: log an error
+          response = null;
+      }
     } catch (FacebookException e) {
       return null;
     }
+
     return response.toString();
   }
 
