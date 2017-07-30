@@ -21,11 +21,11 @@ import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
 import com.sanction.lightning.models.facebook.PublishType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FacebookService {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);

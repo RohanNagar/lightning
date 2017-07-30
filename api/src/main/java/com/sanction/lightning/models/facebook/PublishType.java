@@ -5,12 +5,18 @@ public enum PublishType {
   PHOTO("photo"),
   VIDEO("video");
 
-  private String text;
+  private final String text;
 
   PublishType(String text) {
     this.text = text;
   }
 
+  /**
+   * Provides a PublishType representation of a given string.
+   *
+   * @param text The String to parse into a PublishType.
+   * @return The corresponding PublishType representation.
+   */
   public static PublishType fromString(String text) {
     for (PublishType b : PublishType.values()) {
       if (b.text.equalsIgnoreCase(text)) {

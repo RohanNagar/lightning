@@ -283,42 +283,48 @@ public class FacebookResourceTest {
   /* Publish Tests */
   @Test
   public void testPublishWithNullEmail() {
-    Response response = resource.publish(key, null, "password", PublishType.TEXT, "Test Message", inputStream, contentDisposition, "Test Title");
+    Response response = resource.publish(key, null, "password", PublishType.TEXT,
+        "Test Message", inputStream, contentDisposition, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWithNullPassword() {
-    Response response = resource.publish(key, "Test", null, PublishType.TEXT, "Test Message", inputStream, contentDisposition, "Test Title");
+    Response response = resource.publish(key, "Test", null, PublishType.TEXT,
+        "Test Message", inputStream, contentDisposition, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWithNullType() {
-    Response response = resource.publish(key, "Test", "password", null, "Test Message", inputStream, contentDisposition, "Test Title");
+    Response response = resource.publish(key, "Test", "password", null,
+        "Test Message", inputStream, contentDisposition, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWithBadTypeValue() {
-    Response response = resource.publish(key, "Test", "password", PublishType.fromString("Fake"), "Test Message", inputStream, contentDisposition, "Test Title");
+    Response response = resource.publish(key, "Test", "password", PublishType.fromString("Fake"),
+        "Test Message", inputStream, contentDisposition, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWIthNullInputStream() {
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test Message", null, null, "Test Title");
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test Message", null, null, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
   public void testPublishWIthNullMessage() {
-    Response response = resource.publish(key, "Test", "password", PublishType.TEXT, null, inputStream, contentDisposition, "Test Title");
+    Response response = resource.publish(key, "Test", "password", PublishType.TEXT,
+        null, inputStream, contentDisposition, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -330,8 +336,8 @@ public class FacebookResourceTest {
     when(error.getResponse()).thenReturn(null);
     when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
-        inputStream, contentDisposition, null);
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test", inputStream, contentDisposition, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
@@ -343,8 +349,8 @@ public class FacebookResourceTest {
         new retrofit.client.Response("url", 401, "Unauthorized", Lists.newArrayList(), null));
     when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
-        inputStream, contentDisposition, null);
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test", inputStream, contentDisposition, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -357,8 +363,8 @@ public class FacebookResourceTest {
         new retrofit.client.Response("url", 404, "Not Found", Lists.newArrayList(), null));
     when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
-        inputStream, contentDisposition, null);
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test", inputStream, contentDisposition, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -369,8 +375,8 @@ public class FacebookResourceTest {
         any(PublishType.class), any(String.class), any(String.class),
         any(String.class))).thenReturn(null);
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
-        inputStream, contentDisposition, "Test");
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test", inputStream, contentDisposition, "Test");
 
     assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -381,8 +387,8 @@ public class FacebookResourceTest {
         any(PublishType.class), any(String.class), any(String.class),
         any(String.class))).thenReturn("Test");
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
-        inputStream, contentDisposition, null);
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test", inputStream, contentDisposition, null);
     String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -395,8 +401,8 @@ public class FacebookResourceTest {
         any(PublishType.class), any(String.class), any(String.class),
         any(String.class))).thenReturn("Test");
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, null,
-        inputStream, contentDisposition, "Test");
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        null, inputStream, contentDisposition, "Test");
     String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
@@ -409,8 +415,8 @@ public class FacebookResourceTest {
         any(PublishType.class), any(String.class), any(String.class),
         any(String.class))).thenReturn("Test");
 
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
-        inputStream, contentDisposition, "Test");
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test", inputStream, contentDisposition, "Test");
     String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
