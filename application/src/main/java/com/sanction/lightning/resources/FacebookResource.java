@@ -184,88 +184,6 @@ public class FacebookResource {
   }
 
   /**
-   * Publishes to a user's Facebook timeline.
-   *
-   * @param key The authentication key for the requesting application.
-   * @param email The email of the PilotUser to upload as.
-   * @param password The password of the PilotUser.
-   * @param type The type of the publish to perform.
-   * @param message The text message to publish.
-   * @param inputStream The inputStream for the file to be upload.
-   * @param contentDispositionHeader Additional information about the file to upload.
-   * @param videoTitle If publishing a video, the title to attach to the video.
-   * @return The uploaded file information if the request was successful.
-   */
-  @POST
-  @Path("/publish")
-  @Consumes(MediaType.MULTIPART_FORM_DATA)
-  public Response publish(@Auth Key key,
-                          @QueryParam("email") String email,
-                          @HeaderParam("password") String password,
-                          @QueryParam("type") String type,
-                          @QueryParam("message") String message,
-                          @FormDataParam("file") InputStream inputStream,
-                          @FormDataParam("file") FormDataContentDisposition
-                              contentDispositionHeader,
-                          @FormDataParam("title") @DefaultValue("") String videoTitle) {
-    publishRequests.mark();
-
-    if (email == null) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to publish to Facebook.").build();
-    }
-
-    if (password == null || password.equals("")) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
-    }
-
-    if (type == null) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'type' query parameter is required to publish to Facebook.").build();
-    }
-
-    PublishType publishType = PublishType.fromString(type);
-    if (publishType == null) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'type' query parameter must be either 'photo', 'video', or 'text'.").build();
-    }
-
-    if ((publishType.equals(PublishType.PHOTO) || publishType.equals(PublishType.VIDEO))
-        && inputStream == null) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("A file is required to publish a photo or video.").build();
-    }
-
-    if (publishType.equals(PublishType.TEXT) && (message == null || message.equals(""))) {
-      return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Posting a text message requires the 'message' parameter.").build();
-    }
-
-    PilotUser pilotUser;
-    try {
-      pilotUser = getPilotUser(email, password);
-    } catch (ThunderConnectionException e) {
-      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
-      return e.getResponse();
-    }
-
-    FacebookService facebookService =
-        facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
-
-    String uploadedFile = facebookService.publishToFacebook(inputStream, publishType,
-        contentDispositionHeader.getFileName(), message, videoTitle);
-
-    if (uploadedFile == null) {
-      LOG.error("Error uploading to Facebook for username {}.", email);
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-          .entity("Error uploading to Facebook.").build();
-    }
-
-    return Response.ok(uploadedFile).build();
-  }
-
-  /**
    * Fetches all the videos for the requested PilotUser.
    * This method does not download the actual bytes of the videos.
    *
@@ -312,6 +230,82 @@ public class FacebookResource {
     }
 
     return Response.ok(videoList).build();
+  }
+
+  /**
+   * Publishes to a user's Facebook timeline.
+   *
+   * @param key The authentication key for the requesting application.
+   * @param email The email of the PilotUser to upload as.
+   * @param password The password of the PilotUser.
+   * @param type The type of the publish to perform.
+   * @param message The text message to publish.
+   * @param inputStream The inputStream for the file to be upload.
+   * @param contentDispositionHeader Additional information about the file to upload.
+   * @param videoTitle If publishing a video, the title to attach to the video.
+   * @return The uploaded file information if the request was successful.
+   */
+  @POST
+  @Path("/publish")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  public Response publish(@Auth Key key,
+                          @QueryParam("email") String email,
+                          @HeaderParam("password") String password,
+                          @QueryParam("type") PublishType type,
+                          @QueryParam("message") String message,
+                          @FormDataParam("file") InputStream inputStream,
+                          @FormDataParam("file") FormDataContentDisposition
+                              contentDispositionHeader,
+                          @FormDataParam("title") @DefaultValue("") String videoTitle) {
+    publishRequests.mark();
+
+    if (email == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("The 'email' query parameter is required to publish to Facebook.").build();
+    }
+
+    if (password == null || password.equals("")) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Incorrect or missing header credentials.").build();
+    }
+
+    if (type == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("The 'type' query parameter is required to publish to Facebook.").build();
+    }
+
+    if ((type.equals(PublishType.PHOTO) || type.equals(PublishType.VIDEO))
+        && inputStream == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("A file is required to publish a photo or video.").build();
+    }
+
+    if (type.equals(PublishType.TEXT) && (message == null || message.equals(""))) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Posting a text message requires the 'message' parameter.").build();
+    }
+
+    PilotUser pilotUser;
+    try {
+      pilotUser = getPilotUser(email, password);
+    } catch (ThunderConnectionException e) {
+      LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
+      return e.getResponse();
+    }
+
+    FacebookService facebookService =
+        facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+
+    String uploadedFile = facebookService.publish(inputStream, type, message,
+        contentDispositionHeader.getFileName(), videoTitle);
+
+    if (uploadedFile == null) {
+      LOG.error("Error uploading to Facebook for username {}.", email);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity("Error uploading to Facebook.").build();
+    }
+
+    return Response.ok(uploadedFile).build();
   }
 
   /**

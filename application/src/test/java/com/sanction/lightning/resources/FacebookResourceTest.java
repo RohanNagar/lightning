@@ -205,143 +205,6 @@ public class FacebookResourceTest {
     assertEquals(userResponse, fakeList);
   }
 
-  /* Publish Tests */
-  @Test
-  public void testPublishWithNullEmail() {
-    Response response = resource.publish(key, null, null, null, null, null, null, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-  }
-
-  @Test
-  public void testPublishWithNullPassword() {
-    Response response = resource.publish(key, "Test", null, null, null, null, null, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-  }
-
-  @Test
-  public void testPublishWithNullType() {
-    Response response = resource.publish(key, "Test", "password", null, null, null, null, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-  }
-
-  @Test
-  public void testPublishWithBadTypeValue() {
-    Response response = resource.publish(key, "Test", "password", "Test", null, null, null, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-  }
-
-  @Test
-  public void testPublishWIthNullInputStream() {
-    Response response = resource.publish(key, "Test", "password", "photo", null, null, null, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-  }
-
-  @Test
-  public void testPublishWIthNullMessage() {
-    Response response = resource.publish(key, "Test", "password", "text", null, null, null, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testPublishWithNullRetrofitResponse() {
-    RetrofitError error = mock(RetrofitError.class);
-    when(error.getResponse()).thenReturn(null);
-    when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
-
-    Response response = resource.publish(key, "Test", "password", "photo", "Test",
-        inputStream, contentDisposition, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
-  }
-
-  @Test
-  public void testPublishWithUnauthorizedResponse() {
-    RetrofitError error = mock(RetrofitError.class);
-    when(error.getResponse()).thenReturn(
-        new retrofit.client.Response("url", 401, "Unauthorized", Lists.newArrayList(), null));
-    when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
-
-    Response response = resource.publish(key, "Test", "password", "photo", "Test",
-        inputStream, contentDisposition, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testPublishWithUnknownUser() {
-    RetrofitError error = mock(RetrofitError.class);
-    when(error.getResponse()).thenReturn(
-        new retrofit.client.Response("url", 404, "Not Found", Lists.newArrayList(), null));
-    when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
-
-    Response response = resource.publish(key, "Test", "password", "photo", "Test",
-        inputStream, contentDisposition, null);
-
-    assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
-  }
-
-  @Test
-  public void testPublishWithNullFacebookResponse() {
-    when(facebookService.publishToFacebook(any(InputStream.class),
-        any(PublishType.class), any(String.class), any(String.class),
-        any(String.class))).thenReturn(null);
-
-    Response response = resource.publish(key, "Test", "password", "photo", "Test",
-        inputStream, contentDisposition, "Test");
-
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
-  }
-
-  @Test
-  public void testPublishWithNullVideoTitle() {
-    when(facebookService.publishToFacebook(any(InputStream.class),
-        any(PublishType.class), any(String.class), any(String.class),
-        any(String.class))).thenReturn("Test");
-
-    Response response = resource.publish(key, "Test", "password", "photo", "Test",
-        inputStream, contentDisposition, null);
-    String result = (String) response.getEntity();
-
-    assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(result, "Test");
-  }
-
-  @Test
-  public void testPublishWithNullMessage() {
-    when(facebookService.publishToFacebook(any(InputStream.class),
-        any(PublishType.class), any(String.class), any(String.class),
-        any(String.class))).thenReturn("Test");
-
-    Response response = resource.publish(key, "Test", "password", "photo", null,
-        inputStream, contentDisposition, "Test");
-    String result = (String) response.getEntity();
-
-    assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(result, "Test");
-  }
-
-  @Test
-  public void testPublish() {
-    when(facebookService.publishToFacebook(any(InputStream.class),
-        any(PublishType.class), any(String.class), any(String.class),
-        any(String.class))).thenReturn("Test");
-
-    Response response = resource.publish(key, "Test", "password", "photo", "Test",
-        inputStream, contentDisposition, "Test");
-    String result = (String) response.getEntity();
-
-    assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(result, "Test");
-  }
-
   /* Video Tests */
   @Test
   public void testGetVideosWithNullEmail() {
@@ -417,26 +280,141 @@ public class FacebookResourceTest {
     assertEquals(userResponse, fakeList);
   }
 
-  /* OauthUrl Tests */
+  /* Publish Tests */
+  @Test
+  public void testPublishWithNullEmail() {
+    Response response = resource.publish(key, null, "password", PublishType.TEXT, "Test Message", inputStream, contentDisposition, "Test Title");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullPassword() {
+    Response response = resource.publish(key, "Test", null, PublishType.TEXT, "Test Message", inputStream, contentDisposition, "Test Title");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullType() {
+    Response response = resource.publish(key, "Test", "password", null, "Test Message", inputStream, contentDisposition, "Test Title");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithBadTypeValue() {
+    Response response = resource.publish(key, "Test", "password", PublishType.fromString("Fake"), "Test Message", inputStream, contentDisposition, "Test Title");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWIthNullInputStream() {
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test Message", null, null, "Test Title");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWIthNullMessage() {
+    Response response = resource.publish(key, "Test", "password", PublishType.TEXT, null, inputStream, contentDisposition, "Test Title");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
   @Test
   @SuppressWarnings("unchecked")
-  public void testGetOauthUrlWithOauthException() {
-    when(facebookService.getOauthUrl()).thenThrow(FacebookOAuthException.class);
+  public void testPublishWithNullRetrofitResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(null);
+    when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
 
-    Response response = resource.getOauthUrl(key);
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
+        inputStream, contentDisposition, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
+  }
+
+  @Test
+  public void testPublishWithUnauthorizedResponse() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(
+        new retrofit.client.Response("url", 401, "Unauthorized", Lists.newArrayList(), null));
+    when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
+
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
+        inputStream, contentDisposition, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testPublishWithUnknownUser() {
+    RetrofitError error = mock(RetrofitError.class);
+    when(error.getResponse()).thenReturn(
+        new retrofit.client.Response("url", 404, "Not Found", Lists.newArrayList(), null));
+    when(thunderClient.getUser(anyString(), anyString())).thenThrow(error);
+
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
+        inputStream, contentDisposition, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
 
   @Test
-  public void testGetOauthUrl() {
-    when(facebookService.getOauthUrl()).thenReturn("Test");
+  public void testPublishWithNullFacebookResponse() {
+    when(facebookService.publish(any(InputStream.class),
+        any(PublishType.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn(null);
 
-    Response response = resource.getOauthUrl(key);
-    String string = (String) response.getEntity();
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
+        inputStream, contentDisposition, "Test");
+
+    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+  }
+
+  @Test
+  public void testPublishWithNullVideoTitle() {
+    when(facebookService.publish(any(InputStream.class),
+        any(PublishType.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
+        inputStream, contentDisposition, null);
+    String result = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(string, "Test");
+    assertEquals(result, "Test");
+  }
+
+  @Test
+  public void testPublishWithNullMessage() {
+    when(facebookService.publish(any(InputStream.class),
+        any(PublishType.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, null,
+        inputStream, contentDisposition, "Test");
+    String result = (String) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(result, "Test");
+  }
+
+  @Test
+  public void testPublish() {
+    when(facebookService.publish(any(InputStream.class),
+        any(PublishType.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO, "Test",
+        inputStream, contentDisposition, "Test");
+    String result = (String) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(result, "Test");
   }
 
   /* ExtendedToken Tests */
@@ -521,6 +499,28 @@ public class FacebookResourceTest {
     when(thunderClient.updateUser(any(PilotUser.class), anyString())).thenReturn(pilotUser);
 
     Response response = resource.getExtendedToken(key, "Test", "password");
+    String string = (String) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(string, "Test");
+  }
+
+  /* OauthUrl Tests */
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testGetOauthUrlWithOauthException() {
+    when(facebookService.getOauthUrl()).thenThrow(FacebookOAuthException.class);
+
+    Response response = resource.getOauthUrl(key);
+
+    assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
+  }
+
+  @Test
+  public void testGetOauthUrl() {
+    when(facebookService.getOauthUrl()).thenReturn("Test");
+
+    Response response = resource.getOauthUrl(key);
     String string = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);

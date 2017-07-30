@@ -21,10 +21,14 @@ import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
 import com.sanction.lightning.models.facebook.PublishType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.util.List;
 
 public class FacebookService {
+  private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
   private static final String REDIRECT_URL = "http://example.com";
   private static final Version VERSION = Version.VERSION_2_4;
 
@@ -105,15 +109,15 @@ public class FacebookService {
    *
    * @param inputStream The InputStream of the file to upload to Facebook.
    * @param type The type to upload to perform.
+   * @param message The text to publish.
    * @param fileName The name to call the file on Facebook.
    *                 Will be ignored if only publishing text.
-   * @param message The text to publish.
    * @param videoTitle The title of the video if uploading a video.
    *                   Will be ignored when uploading anything else.
    * @return A String of JSON with returned information if successful, or {@code null} on failure.
    */
-  public String publishToFacebook(InputStream inputStream, PublishType type, String fileName,
-                                  String message, String videoTitle) {
+  public String publish(InputStream inputStream, PublishType type, String message,
+                        String fileName, String videoTitle) {
     List<Parameter> parameters = Lists.newArrayList();
     String endpoint = "me/";
 
@@ -149,8 +153,8 @@ public class FacebookService {
           break;
 
         default:
-          // TODO: log an error
-          response = null;
+          LOG.error("Unknown PublishType {}, unable to publish to Facebook.", type);
+          return null;
       }
     } catch (FacebookException e) {
       return null;
