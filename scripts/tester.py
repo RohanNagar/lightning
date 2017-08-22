@@ -122,18 +122,30 @@ if __name__ == '__main__':
                  params={'email': args.email, 'type': 'photo', 'message': 'Lightning Logo'},
                  headers={'password': password},
                  files={'file': open('application/src/main/resources/logo.png', 'rb')},
-                 data={'title': 'Logo'}),
+                 data={'title': 'Logo'},
+                 expected=requests.codes.created),
         TestCase('POST', '/facebook/publish', authentication,
                  params={'email': args.email, 'type': 'text', 'message': 'Hello World!'},
                  headers={'password': password},
-                 files={'file': ''}),
+                 files={'file': ''},
+                 expected=requests.codes.created),
 
         # Twitter
         TestCase('GET', '/twitter/oauthUrl', authentication),
         TestCase('GET', '/twitter/users', authentication,
                  params={'email': args.email},
                  headers={'password': password}),
-    ]
+        TestCase('POST', '/twitter/publish', authentication,
+                 params={'email': args.email, 'type': 'photo', 'message': 'Test Image'},
+                 headers={'password': password},
+                 files={'file': open('application/src/main/resources/logo.png', 'rb')},
+                 expected=requests.codes.created),
+        TestCase('POST', '/twitter/publish', authentication,
+                 params={'email': args.email, 'type': 'text', 'message': 'Hello World!'},
+                 headers={'password': password},
+                 files={'file': ''},
+                 expected=requests.codes.created),
+]
 
     # Run tests
     run_all(all_tests, args.endpoint, verbose=args.verbose)

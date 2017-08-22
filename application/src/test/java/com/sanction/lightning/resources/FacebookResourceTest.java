@@ -6,10 +6,10 @@ import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
+import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
-import com.sanction.lightning.models.facebook.PublishType;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
@@ -314,17 +314,17 @@ public class FacebookResourceTest {
   }
 
   @Test
-  public void testPublishWIthNullInputStream() {
-    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
-        "Test Message", null, null, "Test Title");
+  public void testPublishTextWithNullMessage() {
+    Response response = resource.publish(key, "Test", "password", PublishType.TEXT,
+        null, inputStream, contentDisposition, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
-  public void testPublishWIthNullMessage() {
-    Response response = resource.publish(key, "Test", "password", PublishType.TEXT,
-        null, inputStream, contentDisposition, "Test Title");
+  public void testPublishPhotoWithNullInputStream() {
+    Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
+        "Test Message", null, null, "Test Title");
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
@@ -382,7 +382,21 @@ public class FacebookResourceTest {
   }
 
   @Test
-  public void testPublishWithNullVideoTitle() {
+  public void testPublishTextWithNullInputStream() {
+    when(facebookService.publish(any(InputStream.class),
+        any(PublishType.class), any(String.class), any(String.class),
+        any(String.class))).thenReturn("Test");
+
+    Response response = resource.publish(key, "Test", "password", PublishType.TEXT,
+        "Test", null, null, null);
+    String result = (String) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
+    assertEquals(result, "Test");
+  }
+
+  @Test
+  public void testPublishPhotoWithNullVideoTitle() {
     when(facebookService.publish(any(InputStream.class),
         any(PublishType.class), any(String.class), any(String.class),
         any(String.class))).thenReturn("Test");
@@ -391,12 +405,12 @@ public class FacebookResourceTest {
         "Test", inputStream, contentDisposition, null);
     String result = (String) response.getEntity();
 
-    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
     assertEquals(result, "Test");
   }
 
   @Test
-  public void testPublishWithNullMessage() {
+  public void testPublishPhotoWithNullMessage() {
     when(facebookService.publish(any(InputStream.class),
         any(PublishType.class), any(String.class), any(String.class),
         any(String.class))).thenReturn("Test");
@@ -405,7 +419,7 @@ public class FacebookResourceTest {
         null, inputStream, contentDisposition, "Test");
     String result = (String) response.getEntity();
 
-    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
     assertEquals(result, "Test");
   }
 
@@ -419,7 +433,7 @@ public class FacebookResourceTest {
         "Test", inputStream, contentDisposition, "Test");
     String result = (String) response.getEntity();
 
-    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
     assertEquals(result, "Test");
   }
 

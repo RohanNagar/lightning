@@ -1,8 +1,15 @@
 package com.sanction.lightning.twitter;
 
+import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.twitter.TwitterUser;
+
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import twitter4j.Status;
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -74,6 +81,33 @@ public class TwitterService {
         twitterUser.getScreenName(),
         twitterUser.getProfileImageURL(),
         twitterUser.isVerified());
+  }
+
+  /**
+   * Publishes text or media to Twitter.
+   *
+   * @param type The type to upload to perform.
+   * @param message The text to publish.
+   * @param filename The name to call the file on Twitter.
+   *                 Will be ignored if only publishing text.
+   * @param inputStream The InputStream of the file to upload to Twitter.
+   * @return The ID of the post if successful, or {@code null} on failure.
+   */
+  public Long publish(PublishType type, String message, String filename, InputStream inputStream) {
+    StatusUpdate update = new StatusUpdate(message);
+    if (type.equals(PublishType.PHOTO) || type.equals(PublishType.VIDEO)) {
+      update.setMedia(filename, inputStream);
+    }
+
+    try {
+      Status status = twitterClient.updateStatus(update);
+
+      return status.getId();
+    } catch (TwitterException e) {
+      LOG.error("Unable to publish to Twitter. "
+          + "Twitter error code: {}", e.getErrorCode(), e);
+      return null;
+    }
   }
 
   /**
