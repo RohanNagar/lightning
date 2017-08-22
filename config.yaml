@@ -18,10 +18,6 @@ twitter:
   app-key:
   app-secret:
 
-dropbox:
-  app-key:
-  app-secret:
-
 # Application Configuration
 server:
   applicationConnectors:
