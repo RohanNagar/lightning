@@ -102,14 +102,18 @@ public class FacebookResource {
     usersRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to get a Facebook user with null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to get a Facebook user.").build();
+          .entity("An email is required to get a Facebook user.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to get a Facebook user without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
+
+    LOG.info("Attempting to get Facebook user information for {}.", email);
 
     PilotUser pilotUser;
     try {
@@ -126,11 +130,12 @@ public class FacebookResource {
     try {
       facebookUser = facebookService.getFacebookUser();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for username {}.", email, e);
+      LOG.error("Bad Facebook OAuth token for {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
+    LOG.info("Successfully retrieved Facebook user information for {}.", email);
     return Response.ok(facebookUser).build();
   }
 
@@ -151,14 +156,18 @@ public class FacebookResource {
     photosRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to get Facebook photos with null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to get Facebook photos.").build();
+          .entity("An email is required to get Facebook photos.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to get Facebook photos without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
+
+    LOG.info("Attempting to get Facebook photos for user {}.", email);
 
     PilotUser pilotUser;
     try {
@@ -175,11 +184,12 @@ public class FacebookResource {
     try {
       photoList = facebookService.getFacebookUserPhotos();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for email {}.", email, e);
+      LOG.error("Bad Facebook OAuth token for {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
+    LOG.info("Successfully retrieved Facebook photo information for user {}.", email);
     return Response.ok(photoList).build();
   }
 
@@ -200,14 +210,18 @@ public class FacebookResource {
     videosRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to get Facebook videos with null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to get videos.").build();
+          .entity("An email is required to get videos.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to get Facebook videos without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
+
+    LOG.info("Attempting to get Facebook video information for user {}.", email);
 
     PilotUser pilotUser;
     try {
@@ -224,11 +238,12 @@ public class FacebookResource {
     try {
       videoList = facebookService.getFacebookUserVideos();
     } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for email {}.", email, e);
+      LOG.error("Bad Facebook OAuth token for {}.", email, e);
       return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
+    LOG.info("Successfully retrieved Facebook video information for user {}.", email);
     return Response.ok(videoList).build();
   }
 
@@ -260,30 +275,37 @@ public class FacebookResource {
     publishRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to publish to Facebook with null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to publish to Facebook.").build();
+          .entity("An email is required to publish to Facebook.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to publish to Facebook without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
 
     if (type == null) {
+      LOG.warn("Attempted to publish to Facebook without specifying the type.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'type' query parameter is required to publish to Facebook.").build();
+          .entity("A type of text, photo, or video is required to publish to Facebook.").build();
     }
 
     if ((type.equals(PublishType.PHOTO) || type.equals(PublishType.VIDEO))
         && inputStream == null) {
+      LOG.warn("Attempted to publish media to Facebook without supplying the media.");
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("A file is required to publish a photo or video.").build();
     }
 
     if (type.equals(PublishType.TEXT) && (message == null || message.equals(""))) {
+      LOG.warn("Attempted to publish text to Facebook without supplying the text.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Posting a text message requires the 'message' parameter.").build();
+          .entity("Posting a text message requires the message parameter.").build();
     }
+
+    LOG.info("Attempting to publish {} to Facebook for user {}.", type, email);
 
     PilotUser pilotUser;
     try {
@@ -308,11 +330,12 @@ public class FacebookResource {
         filename, videoTitle);
 
     if (uploadedFile == null) {
-      LOG.error("Error uploading to Facebook for username {}.", email);
+      LOG.error("Error uploading to Facebook for {}.", email);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
           .entity("Error uploading to Facebook.").build();
     }
 
+    LOG.info("Successfully published {} to Facebook for user {}.", type, email);
     return Response.status(Response.Status.CREATED).entity(uploadedFile).build();
   }
 
@@ -332,14 +355,18 @@ public class FacebookResource {
     tokenRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to extend a Facebook OAuth token with a null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to extend a token.").build();
+          .entity("An email is required to extend a token.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to extend a Facebook OAuth token without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
+
+    LOG.info("Attempting to extend Facebook OAuth token for user {}.", email);
 
     PilotUser pilotUser;
     try {
@@ -374,6 +401,7 @@ public class FacebookResource {
           .build();
     }
 
+    LOG.info("Successfully extended the Facebook OAuth token for user {}.", email);
     return Response.ok(extendedToken).build();
   }
 
@@ -389,6 +417,8 @@ public class FacebookResource {
   public Response getOauthUrl(@Auth Key key) {
     oauthRequests.mark();
 
+    LOG.info("Retrieving OAuth URL to authenticate with Facebook.");
+
     FacebookService facebookService = facebookServiceFactory.newFacebookService();
 
     String permissionsUrl;
@@ -400,6 +430,7 @@ public class FacebookResource {
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
+    LOG.info("Successfully built Facebook OAuth URL.");
     return Response.ok(permissionsUrl).build();
   }
 
@@ -420,10 +451,11 @@ public class FacebookResource {
 
       // If unauthorized, the API keys are incorrect - Internal Server Error.
       if (e.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-        LOG.error("Incorrect API Keys to access Thunder.");
+        LOG.error("Incorrect user password, unable to access Thunder"
+            + " (or, less likely, bad API keys).");
         throw new ThunderConnectionException(
             Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Database error: " + e.getMessage())
+                .entity("Error: " + e.getMessage())
                 .build());
       }
 

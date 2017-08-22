@@ -157,6 +157,7 @@ public class FacebookService {
           return null;
       }
     } catch (FacebookException e) {
+      LOG.error("Unknown error while publishing to Facebook.");
       return null;
     }
 
