@@ -1,6 +1,6 @@
 # Thunder Access
 thunder:
-  endpoint: http://thunder.nickeckert.com
+  endpoint: http://thunder.sanctionco.com
   user-key: lightning
   user-secret: secret
 

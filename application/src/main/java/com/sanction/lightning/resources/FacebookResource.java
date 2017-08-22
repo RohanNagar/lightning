@@ -7,10 +7,10 @@ import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.exception.ThunderConnectionException;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
+import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
-import com.sanction.lightning.models.facebook.PublishType;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 import io.dropwizard.auth.Auth;
@@ -296,8 +296,16 @@ public class FacebookResource {
     FacebookService facebookService =
         facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
+    // Get the name of the file if publishing media
+    String filename;
+    if (type.equals(PublishType.TEXT)) {
+      filename = null;
+    } else {
+      filename = contentDispositionHeader.getFileName();
+    }
+
     String uploadedFile = facebookService.publish(inputStream, type, message,
-        contentDispositionHeader.getFileName(), videoTitle);
+        filename, videoTitle);
 
     if (uploadedFile == null) {
       LOG.error("Error uploading to Facebook for username {}.", email);
@@ -305,7 +313,7 @@ public class FacebookResource {
           .entity("Error uploading to Facebook.").build();
     }
 
-    return Response.ok(uploadedFile).build();
+    return Response.status(Response.Status.CREATED).entity(uploadedFile).build();
   }
 
   /**

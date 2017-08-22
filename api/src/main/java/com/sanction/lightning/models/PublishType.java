@@ -1,4 +1,4 @@
-package com.sanction.lightning.models.facebook;
+package com.sanction.lightning.models;
 
 public enum PublishType {
   TEXT("text"),

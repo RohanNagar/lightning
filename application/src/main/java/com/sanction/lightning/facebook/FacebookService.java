@@ -15,11 +15,11 @@ import com.restfb.scope.ExtendedPermissions;
 import com.restfb.scope.ScopeBuilder;
 import com.restfb.scope.UserDataPermissions;
 
+import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookPhotoDetail;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
-import com.sanction.lightning.models.facebook.PublishType;
 
 import java.io.InputStream;
 import java.util.List;

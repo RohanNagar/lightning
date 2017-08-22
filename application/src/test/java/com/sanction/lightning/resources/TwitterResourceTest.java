@@ -2,18 +2,23 @@ package com.sanction.lightning.resources;
 
 import com.codahale.metrics.MetricRegistry;
 import com.sanction.lightning.authentication.Key;
+import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
 import com.sanction.thunder.ThunderClient;
 import com.sanction.thunder.models.PilotUser;
 
+import java.io.InputStream;
+
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,6 +28,9 @@ public class TwitterResourceTest {
   private final TwitterServiceFactory serviceFactory = mock(TwitterServiceFactory.class);
   private final MetricRegistry metrics = new MetricRegistry();
   private final TwitterService service = mock(TwitterService.class);
+  private final InputStream inputStream = mock(InputStream.class);
+  private final FormDataContentDisposition contentDisposition =
+      mock(FormDataContentDisposition.class);
 
   private final PilotUser pilotUser = mock(PilotUser.class);
   private final Key key = mock(Key.class);
@@ -78,6 +86,109 @@ public class TwitterResourceTest {
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
     assertEquals(user, mockUser);
+  }
+
+  /* Publish Tests */
+  @Test
+  public void testPublishWithNullEmail() {
+    Response response = resource.publish(key, null, "password",
+        PublishType.TEXT, "message", inputStream, contentDisposition);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullPassword() {
+    Response response = resource.publish(key, "Test", null,
+        PublishType.TEXT, "message", inputStream, contentDisposition);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullType() {
+    Response response = resource.publish(key, "Test", "password",
+        null, "message", inputStream, contentDisposition);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithBadTypeValue() {
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.fromString("Fake"), "message", inputStream, contentDisposition);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishTextWithNullMessage() {
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.TEXT, null, inputStream, contentDisposition);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullInputStream() {
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.PHOTO, "message", null, null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testPublishWithNullTwitterResponse() {
+    when(service.publish(any(PublishType.class), any(String.class),
+        any(String.class), any(InputStream.class)))
+        .thenReturn(null);
+
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.TEXT, "message", inputStream, contentDisposition);
+
+    assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
+  }
+
+  @Test
+  public void testPublishPhotoWithNullMessage() {
+    when(service.publish(any(PublishType.class), any(String.class),
+        any(String.class), any(InputStream.class)))
+        .thenReturn(1L);
+
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.PHOTO, null, inputStream, contentDisposition);
+    Long result = (Long) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
+    assertEquals(result, Long.valueOf(1));
+  }
+
+  @Test
+  public void testPublishTextWithNullInputStream() {
+    when(service.publish(any(PublishType.class), any(String.class),
+        any(String.class), any(InputStream.class)))
+        .thenReturn(1L);
+
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.TEXT, "message", null, null);
+    Long result = (Long) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
+    assertEquals(result, Long.valueOf(1));
+  }
+
+  @Test
+  public void testPublish() {
+    when(service.publish(any(PublishType.class), any(String.class),
+        any(String.class), any(InputStream.class)))
+        .thenReturn(1L);
+
+    Response response = resource.publish(key, "Test", "password",
+        PublishType.PHOTO, "message", inputStream, contentDisposition);
+    Long result = (Long) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.CREATED);
+    assertEquals(result, Long.valueOf(1));
   }
 
   /* OAuth Token Tests */
