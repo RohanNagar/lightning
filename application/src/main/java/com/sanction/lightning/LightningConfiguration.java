@@ -3,7 +3,6 @@ package com.sanction.lightning;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.config.ThunderConfiguration;
-import com.sanction.lightning.dropbox.DropboxConfiguration;
 import com.sanction.lightning.facebook.FacebookConfiguration;
 import com.sanction.lightning.twitter.TwitterConfiguration;
 import io.dropwizard.Configuration;
@@ -22,15 +21,6 @@ public class LightningConfiguration extends Configuration {
 
   ThunderConfiguration getThunderConfiguration() {
     return thunderConfiguration;
-  }
-
-  @NotNull
-  @Valid
-  @JsonProperty("dropbox")
-  private final DropboxConfiguration dropboxConfiguration = null;
-
-  DropboxConfiguration getDropboxConfiguration() {
-    return dropboxConfiguration;
   }
 
   @NotNull

@@ -26,10 +26,14 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/twitter")
 @Produces(MediaType.APPLICATION_JSON)
 public class TwitterResource {
+  private static final Logger LOG = LoggerFactory.getLogger(TwitterResource.class);
+
   private final ThunderClient thunderClient;
   private final TwitterServiceFactory twitterServiceFactory;
 
@@ -79,14 +83,18 @@ public class TwitterResource {
     usersRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to get Twitter user information with a null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to get a Twitter user.").build();
+          .entity("An email is required to get a Twitter user.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to get Twitter user information without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
+
+    LOG.info("Attempting to get Twitter user information for user {}.", email);
 
     PilotUser pilotUser = thunderClient.getUser(email, password);
     TwitterService service = twitterServiceFactory.newTwitterService(
@@ -95,10 +103,12 @@ public class TwitterResource {
 
     TwitterUser user = service.getTwitterUser();
     if (user == null) {
+      LOG.error("Unable to retrieve user information from Twitter for {}.", email);
       return Response.status(Response.Status.SERVICE_UNAVAILABLE)
           .entity("Unable to retrieve information from Twitter.").build();
     }
 
+    LOG.info("Successfully retrieved Twitter user information for {}.", email);
     return Response.ok(user).build();
   }
 
@@ -128,30 +138,37 @@ public class TwitterResource {
     publishRequests.mark();
 
     if (email == null) {
+      LOG.warn("Attempted to publish to Twitter with a null email.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'email' query parameter is required to post a tweet.").build();
+          .entity("An email is required to post a tweet.").build();
     }
 
     if (password == null || password.equals("")) {
+      LOG.warn("Attempted to publish to Twitter without a password.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Incorrect or missing header credentials.").build();
+          .entity("The user password is required to exist in the header.").build();
     }
 
     if (type == null) {
+      LOG.warn("Attempted to publish to Twitter without specifying the type.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("The 'type' query parameter is required to determine what to publish.").build();
+          .entity("A type of text, photo, or video is required to publish to Twitter.").build();
     }
 
     if ((type.equals(PublishType.PHOTO) || type.equals(PublishType.VIDEO))
         && inputStream == null) {
+      LOG.warn("Attempted to publish media to Twitter without supplying media.");
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("A file is required to publish a photo or video.").build();
     }
 
     if (type.equals(PublishType.TEXT) && (message == null || message.equals(""))) {
+      LOG.warn("Attempted to publish test to Twitter without supplying the text.");
       return Response.status(Response.Status.BAD_REQUEST)
-          .entity("Posting a text message requires the 'message' parameter.").build();
+          .entity("Posting a text message requires the message parameter.").build();
     }
+
+    LOG.info("Attempting to publish {} to Twitter for {}.", type, email);
 
     PilotUser pilotUser = thunderClient.getUser(email, password);
     TwitterService service = twitterServiceFactory.newTwitterService(
@@ -168,10 +185,12 @@ public class TwitterResource {
 
     Long id = service.publish(type, message, filename, inputStream);
     if (id == null) {
+      LOG.error("Unable to publish {} to Twitter for user {}.", type, email);
       return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-          .entity("Unable to retrieve information from Twitter.").build();
+          .entity("Unable to publish to Twitter.").build();
     }
 
+    LOG.info("Successfully published {} to Twitter for user {}.", type, email);
     return Response.status(Response.Status.CREATED).entity(id).build();
   }
 
@@ -186,14 +205,18 @@ public class TwitterResource {
   public Response getOAuthUrl(@Auth Key key) {
     oauthRequests.mark();
 
+    LOG.info("Attempting to retrieve Twitter OAuth URL.");
+
     TwitterService service = twitterServiceFactory.newTwitterService();
 
     String url = service.getAuthorizationUrl();
     if (url == null) {
+      LOG.error("Unable to build OAuth URL for Twitter.");
       return Response.status(Response.Status.SERVICE_UNAVAILABLE)
           .entity("Unable to retrieve OAuth URL from Twitter.").build();
     }
 
+    LOG.info("Successfully built OAuth URL for Twitter.");
     return Response.ok(url).build();
   }
 }

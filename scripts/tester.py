@@ -101,9 +101,6 @@ if __name__ == '__main__':
 
     # Define test cases
     all_tests = [
-        # Dropbox
-        TestCase('GET', '/dropbox/oauthUrl', authentication),
-
         # Facebook
         TestCase('GET', '/facebook/oauthUrl', authentication),
         TestCase('GET', '/facebook/users', authentication,
