@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 public class FacebookService {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
-  private static final String REDIRECT_URL = "http://example.com";
   private static final Version VERSION = Version.VERSION_2_4;
 
   private final DefaultFacebookClient client;
@@ -191,7 +190,7 @@ public class FacebookService {
    *
    * @return The URL string for the permissions URL.
    */
-  public String getOauthUrl() {
+  public String getOauthUrl(String redirectUrl) {
     ScopeBuilder scopeBuilder = new ScopeBuilder()
         .addPermission(UserDataPermissions.USER_PHOTOS)
         .addPermission(UserDataPermissions.USER_VIDEOS)
@@ -199,7 +198,7 @@ public class FacebookService {
         .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
         .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
-    return client.getLoginDialogUrl(appId, REDIRECT_URL, scopeBuilder);
+    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder);
   }
 
   /**
