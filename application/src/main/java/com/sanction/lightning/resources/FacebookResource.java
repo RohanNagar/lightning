@@ -414,8 +414,15 @@ public class FacebookResource {
    */
   @GET
   @Path("/oauthUrl")
-  public Response getOauthUrl(@Auth Key key) {
+  public Response getOauthUrl(@Auth Key key,
+                              @QueryParam("redirect") String redirectUrl) {
     oauthRequests.mark();
+
+    if (redirectUrl == null) {
+      LOG.warn("Cannot get OAuth URL without a redirect URL specified.");
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("An redirect URL is required to get an OAuth URL.").build();
+    }
 
     LOG.info("Retrieving OAuth URL to authenticate with Facebook.");
 
@@ -423,7 +430,7 @@ public class FacebookResource {
 
     String permissionsUrl;
     try {
-      permissionsUrl = facebookService.getOauthUrl();
+      permissionsUrl = facebookService.getOauthUrl(redirectUrl);
     } catch (FacebookOAuthException e) {
       LOG.error("Bad Facebook OAuth token.", e);
       return Response.status(Response.Status.NOT_FOUND)
