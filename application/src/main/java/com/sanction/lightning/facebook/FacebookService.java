@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class FacebookService {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
-  private static final Version VERSION = Version.VERSION_2_4;
+  private static final Version VERSION = Version.VERSION_2_10;
 
   private final DefaultFacebookClient client;
   private final String appId;
@@ -156,7 +156,7 @@ public class FacebookService {
           return null;
       }
     } catch (FacebookException e) {
-      LOG.error("Unknown error while publishing to Facebook.");
+      LOG.error("Unknown error while publishing to Facebook.", e);
       return null;
     }
 
@@ -198,7 +198,8 @@ public class FacebookService {
         .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
         .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
-    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder);
+    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
+        Parameter.with("response_type", "token"));
   }
 
   /**

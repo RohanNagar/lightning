@@ -102,7 +102,8 @@ if __name__ == '__main__':
     # Define test cases
     all_tests = [
         # Facebook
-        TestCase('GET', '/facebook/oauthUrl', authentication),
+        TestCase('GET', '/facebook/oauthUrl', authentication,
+                 params={'redirect': 'sample://url'}),
         TestCase('GET', '/facebook/users', authentication,
                  params={'email': args.email},
                  headers={'password': password}),
