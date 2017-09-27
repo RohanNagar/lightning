@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class FacebookService {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
-  private static final Version VERSION = Version.VERSION_2_4;
+  private static final Version VERSION = Version.VERSION_2_10;
 
   private final DefaultFacebookClient client;
   private final String appId;
