@@ -156,7 +156,7 @@ public class FacebookService {
           return null;
       }
     } catch (FacebookException e) {
-      LOG.error("Unknown error while publishing to Facebook.");
+      LOG.error("Unknown error while publishing to Facebook.", e);
       return null;
     }
 
@@ -198,7 +198,8 @@ public class FacebookService {
         .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
         .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
-    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder);
+    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
+        Parameter.with("response_type", "token"));
   }
 
   /**
