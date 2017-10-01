@@ -529,8 +529,6 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetOauthUrlWithNullRedirect() {
-    when(facebookService.getOauthUrl(anyString())).thenThrow(FacebookOAuthException.class);
-
     Response response = resource.getOauthUrl(key, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
@@ -541,7 +539,7 @@ public class FacebookResourceTest {
   public void testGetOauthUrlWithOauthException() {
     when(facebookService.getOauthUrl(anyString())).thenThrow(FacebookOAuthException.class);
 
-    Response response = resource.getOauthUrl(key, "redirect");
+    Response response = resource.getOauthUrl(key, "example.com");
 
     assertEquals(response.getStatusInfo(), Response.Status.NOT_FOUND);
   }
@@ -550,7 +548,7 @@ public class FacebookResourceTest {
   public void testGetOauthUrl() {
     when(facebookService.getOauthUrl(anyString())).thenReturn("Test");
 
-    Response response = resource.getOauthUrl(key, "redirect");
+    Response response = resource.getOauthUrl(key, "example.com");
     String string = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);

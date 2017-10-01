@@ -410,6 +410,7 @@ public class FacebookResource {
    * presented with to approve permissions.
    *
    * @param key The authentication key for the requesting application.
+   * @param redirectUrl The URL that Facebook should redirect to after the user authenticates.
    * @return The URL to redirect the user to.
    */
   @GET

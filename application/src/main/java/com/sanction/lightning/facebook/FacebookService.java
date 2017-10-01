@@ -188,6 +188,7 @@ public class FacebookService {
    * Builds a URL that sends a user to a Facebook authentication page
    * to request the correct permissions.
    *
+   * @param redirectUrl The URL that Facebook should redirect to after the user authenticates.
    * @return The URL string for the permissions URL.
    */
   public String getOauthUrl(String redirectUrl) {

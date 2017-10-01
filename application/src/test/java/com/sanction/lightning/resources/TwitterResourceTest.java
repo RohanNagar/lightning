@@ -193,19 +193,26 @@ public class TwitterResourceTest {
 
   /* OAuth Token Tests */
   @Test
-  public void testGetOAuthTokenFailure() {
-    when(service.getAuthorizationUrl()).thenReturn(null);
+  public void testGetOAuthTokenWithNullRedirect() {
+    Response response = resource.getOAuthUrl(key, null);
 
-    Response response = resource.getOAuthUrl(key);
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetOAuthTokenFailure() {
+    when(service.getAuthorizationUrl(anyString())).thenReturn(null);
+
+    Response response = resource.getOAuthUrl(key, "example.com");
 
     assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
   }
 
   @Test
   public void testGetOAuthTokenSuccess() {
-    when(service.getAuthorizationUrl()).thenReturn("URL");
+    when(service.getAuthorizationUrl(anyString())).thenReturn("URL");
 
-    Response response = resource.getOAuthUrl(key);
+    Response response = resource.getOAuthUrl(key, "example.com");
     String url = (String) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
