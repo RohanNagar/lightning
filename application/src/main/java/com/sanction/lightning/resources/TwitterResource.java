@@ -198,18 +198,26 @@ public class TwitterResource {
    * Generates a Twitter URL that can be used to authenticate a PilotUser.
    *
    * @param key The authentication credentials of the calling application.
+   * @param redirectUrl The URL that Twitter should redirect to after the user authenticates.
    * @return The application authentication URL, if successful.
    */
   @GET
   @Path("/oauthUrl")
-  public Response getOAuthUrl(@Auth Key key) {
+  public Response getOAuthUrl(@Auth Key key,
+                              @QueryParam("redirect") String redirectUrl) {
     oauthRequests.mark();
+
+    if (redirectUrl == null) {
+      LOG.warn("Cannot get OAuth URL without a redirect URL specified.");
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("An redirect URL is required to get an OAuth URL.").build();
+    }
 
     LOG.info("Attempting to retrieve Twitter OAuth URL.");
 
     TwitterService service = twitterServiceFactory.newTwitterService();
 
-    String url = service.getAuthorizationUrl();
+    String url = service.getAuthorizationUrl(redirectUrl);
     if (url == null) {
       LOG.error("Unable to build OAuth URL for Twitter.");
       return Response.status(Response.Status.SERVICE_UNAVAILABLE)

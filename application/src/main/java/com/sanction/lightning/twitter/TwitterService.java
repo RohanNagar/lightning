@@ -19,9 +19,6 @@ import twitter4j.conf.ConfigurationBuilder;
 public class TwitterService {
   private static final Logger LOG = LoggerFactory.getLogger(TwitterService.class);
 
-  // TODO: replace redirect URL
-  private static final String REDIRECT_URL = "http://example.com";
-
   private final Twitter twitterClient;
 
   /**
@@ -114,11 +111,12 @@ public class TwitterService {
    * Retrieves a new OAuth URL from Twitter.
    * Should only be called if the TwitterService was constructed without an authenticating user.
    *
+   * @param redirectUrl The URL that Twitter should redirect to after the user authenticates.
    * @return The URL to redirect to for authentication or {@code null} if unable to fetch the URL.
    */
-  public String getAuthorizationUrl() {
+  public String getAuthorizationUrl(String redirectUrl) {
     try {
-      return twitterClient.getOAuthRequestToken(REDIRECT_URL).getAuthorizationURL();
+      return twitterClient.getOAuthRequestToken(redirectUrl).getAuthorizationURL();
     } catch (TwitterException e) {
       LOG.error("Unable to get authorization URL from Twitter. "
           + "Twitter error code: {}", e.getErrorCode(), e);

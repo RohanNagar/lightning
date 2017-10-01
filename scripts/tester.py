@@ -129,7 +129,8 @@ if __name__ == '__main__':
                  expected=requests.codes.created),
 
         # Twitter
-        TestCase('GET', '/twitter/oauthUrl', authentication),
+        TestCase('GET', '/twitter/oauthUrl', authentication,
+                 params={'redirect': 'sample://url'}),
         TestCase('GET', '/twitter/users', authentication,
                  params={'email': args.email},
                  headers={'password': password}),
