@@ -379,12 +379,11 @@ public class FacebookResource {
     FacebookService facebookService
         = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
-    String extendedToken;
-    try {
-      extendedToken = facebookService.getFacebookExtendedToken();
-    } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth Token for email {}.", email, e);
-      return Response.status(Response.Status.NOT_FOUND)
+    String extendedToken = facebookService.getFacebookExtendedToken();
+
+    if (extendedToken == null) {
+      LOG.error("Bad Facebook OAuth Token for email {}.", email);
+      return Response.status(Response.Status.UNAUTHORIZED)
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
@@ -429,13 +428,12 @@ public class FacebookResource {
 
     FacebookService facebookService = facebookServiceFactory.newFacebookService();
 
-    String permissionsUrl;
-    try {
-      permissionsUrl = facebookService.getOauthUrl(redirectUrl);
-    } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token.", e);
-      return Response.status(Response.Status.NOT_FOUND)
-          .entity("Request rejected due to bad OAuth token.").build();
+    String permissionsUrl = facebookService.getOauthUrl(redirectUrl);
+
+    if (permissionsUrl == null) {
+      LOG.error("Something went wrong while getting the OAuth URL.");
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity("Something went wrong, please try again later.").build();
     }
 
     LOG.info("Successfully built Facebook OAuth URL.");
@@ -457,12 +455,12 @@ public class FacebookResource {
                 .build());
       }
 
-      // If unauthorized, the API keys are incorrect - Internal Server Error.
+      // If unauthorized, the user password was incorrect. The request is unauthorized.
       if (e.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
         LOG.error("Incorrect user password, unable to access Thunder"
             + " (or, less likely, bad API keys).");
         throw new ThunderConnectionException(
-            Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            Response.status(Response.Status.UNAUTHORIZED)
                 .entity("Error: " + e.getMessage())
                 .build());
       }

@@ -9,6 +9,7 @@ import com.restfb.FacebookClient.AccessToken;
 import com.restfb.Parameter;
 import com.restfb.Version;
 import com.restfb.exception.FacebookException;
+import com.restfb.exception.FacebookOAuthException;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 import com.restfb.scope.ExtendedPermissions;
@@ -155,6 +156,9 @@ public class FacebookService {
           LOG.error("Unknown PublishType {}, unable to publish to Facebook.", type);
           return null;
       }
+    } catch (FacebookOAuthException e) {
+      LOG.error("Current user could not authenticate with Facebook.", e);
+      return null;
     } catch (FacebookException e) {
       LOG.error("Unknown error while publishing to Facebook.", e);
       return null;
@@ -170,11 +174,20 @@ public class FacebookService {
    * @return A list of FacebookVideo objects representing the user's videos.
    */
   public List<FacebookVideo> getFacebookUserVideos() {
-    JsonObject videos = client.fetchObject("me/videos", JsonObject.class,
-            Parameter.with("type", "uploaded"), Parameter.with("fields", "id, source"));
-    JsonArray videoArray = videos.getJsonArray("data");
+    JsonObject videos;
 
+    try {
+      videos = client.fetchObject("me/videos", JsonObject.class,
+          Parameter.with("type", "uploaded"),
+          Parameter.with("fields", "id, source"));
+    } catch (FacebookOAuthException e) {
+      LOG.error("Caught Facebook OAuth error while getting user videos.", e);
+      return null;
+    }
+
+    JsonArray videoArray = videos.getJsonArray("data");
     List<FacebookVideo> videoList = Lists.newArrayList();
+
     for (int i = 0; i < videoArray.length() - 1; i++) {
       JsonObject obj = videoArray.getJsonObject(i);
       FacebookVideo vid = new FacebookVideo(obj.getString("id"), obj.getString("source"));
@@ -199,8 +212,13 @@ public class FacebookService {
         .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
         .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
-    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
-        Parameter.with("response_type", "token"));
+    try {
+      return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
+          Parameter.with("response_type", "token"));
+    } catch (FacebookException e) {
+      LOG.error("An error occurred while getting Oauth URL from Facebook:", e);
+      return null;
+    }
   }
 
   /**
