@@ -9,6 +9,7 @@ import com.restfb.FacebookClient.AccessToken;
 import com.restfb.Parameter;
 import com.restfb.Version;
 import com.restfb.exception.FacebookException;
+import com.restfb.exception.FacebookOAuthException;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 import com.restfb.scope.ExtendedPermissions;
@@ -68,8 +69,13 @@ public class FacebookService {
    * @return A FacebookUser object containing the user's information.
    */
   public FacebookUser getFacebookUser() {
-    return client.fetchObject("me", FacebookUser.class,
-        Parameter.with("fields", "first_name, last_name, middle_name, gender, name, verified"));
+    try {
+      return client.fetchObject("me", FacebookUser.class,
+          Parameter.with("fields", "first_name, last_name, middle_name, gender, name, verified"));
+    } catch (FacebookOAuthException e) {
+      LOG.error("Facebook OAuth error while getting user details.", e);
+      return null;
+    }
   }
 
   /**
@@ -80,27 +86,67 @@ public class FacebookService {
    */
   public List<FacebookPhoto> getFacebookUserPhotos() {
     // Fetch a JSON object containing an array of photos, each with specified properties
-    JsonObject photos = client.fetchObject("me/photos", JsonObject.class,
-            Parameter.with("type", "uploaded"), Parameter.with("fields", "id, images"));
+    JsonObject photos;
 
-    // Fetch the photo array from JsonObject and make a JsonArray
+    try {
+      photos = client.fetchObject("me/photos", JsonObject.class,
+          Parameter.with("type", "uploaded"), Parameter.with("fields", "id, images"));
+    } catch (FacebookOAuthException e) {
+      LOG.error("Facebook OAuth error while getting user photos.", e);
+      return null;
+    }
+
+    // Get the data from the JsonObject
     JsonArray photosArray = photos.getJsonArray("data");
-
     List<FacebookPhoto> photoList = Lists.newArrayList();
 
-    // Construct a JsonMapper for JSON string to FacebookPhotoDetail conversion
+    // JSON string to FacebookPhotoDetail conversion
     DefaultJsonMapper mapper = new DefaultJsonMapper();
+
     for (int i = 0; i < photosArray.length(); i++) {
       JsonObject obj = photosArray.getJsonObject(i);
+
       List<FacebookPhotoDetail> detailList = mapper.toJavaList(obj.getString("images"),
           FacebookPhotoDetail.class);
       FacebookPhotoDetail detail = detailList.get(0);
-      FacebookPhoto pic = new FacebookPhoto(obj.getString("id"), detail.getUri(),
+
+      FacebookPhoto photo = new FacebookPhoto(obj.getString("id"), detail.getUri(),
           detail.getHeight(), detail.getWidth());
-      photoList.add(pic);
+      photoList.add(photo);
     }
 
     return photoList;
+  }
+
+  /**
+   * Retrieves the authenticating user's Facebook videos.
+   * This method does not download the actual video bytes.
+   *
+   * @return A list of FacebookVideo objects representing the user's videos.
+   */
+  public List<FacebookVideo> getFacebookUserVideos() {
+    JsonObject videos;
+
+    try {
+      videos = client.fetchObject("me/videos", JsonObject.class,
+          Parameter.with("type", "uploaded"),
+          Parameter.with("fields", "id, source"));
+    } catch (FacebookOAuthException e) {
+      LOG.error("Facebook OAuth error while getting user videos.", e);
+      return null;
+    }
+
+    JsonArray videoArray = videos.getJsonArray("data");
+    List<FacebookVideo> videoList = Lists.newArrayList();
+
+    for (int i = 0; i < videoArray.length() - 1; i++) {
+      JsonObject obj = videoArray.getJsonObject(i);
+
+      FacebookVideo vid = new FacebookVideo(obj.getString("id"), obj.getString("source"));
+      videoList.add(vid);
+    }
+
+    return videoList;
   }
 
   /**
@@ -155,33 +201,15 @@ public class FacebookService {
           LOG.error("Unknown PublishType {}, unable to publish to Facebook.", type);
           return null;
       }
+    } catch (FacebookOAuthException e) {
+      LOG.error("Facebook OAuth error while publishing.", e);
+      return null;
     } catch (FacebookException e) {
       LOG.error("Unknown error while publishing to Facebook.", e);
       return null;
     }
 
     return response.toString();
-  }
-
-  /**
-   * Retrieves the authenticating user's Facebook videos.
-   * This method does not download the actual video bytes.
-   *
-   * @return A list of FacebookVideo objects representing the user's videos.
-   */
-  public List<FacebookVideo> getFacebookUserVideos() {
-    JsonObject videos = client.fetchObject("me/videos", JsonObject.class,
-            Parameter.with("type", "uploaded"), Parameter.with("fields", "id, source"));
-    JsonArray videoArray = videos.getJsonArray("data");
-
-    List<FacebookVideo> videoList = Lists.newArrayList();
-    for (int i = 0; i < videoArray.length() - 1; i++) {
-      JsonObject obj = videoArray.getJsonObject(i);
-      FacebookVideo vid = new FacebookVideo(obj.getString("id"), obj.getString("source"));
-      videoList.add(vid);
-    }
-
-    return videoList;
   }
 
   /**
@@ -199,8 +227,13 @@ public class FacebookService {
         .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
         .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
 
-    return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
-        Parameter.with("response_type", "token"));
+    try {
+      return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
+          Parameter.with("response_type", "token"));
+    } catch (FacebookException e) {
+      LOG.error("An error occurred while getting Oauth URL from Facebook:", e);
+      return null;
+    }
   }
 
   /**
