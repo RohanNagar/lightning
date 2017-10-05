@@ -2,7 +2,6 @@ package com.sanction.lightning.resources;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
-import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
@@ -92,7 +91,7 @@ public class FacebookResourceTest {
 
     Response response = resource.getUser(key, "Test", "password");
 
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+    assertEquals(response.getStatusInfo(), Response.Status.UNAUTHORIZED);
   }
 
   @Test
@@ -111,7 +110,7 @@ public class FacebookResourceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetUserWithExpiredOAuth() {
-    when(facebookService.getFacebookUser()).thenThrow(FacebookOAuthException.class);
+    when(facebookService.getFacebookUser()).thenReturn(null);
 
     Response response = resource.getUser(key, "Test", "password");
 
@@ -166,7 +165,7 @@ public class FacebookResourceTest {
 
     Response response = resource.getPhotos(key, "Test", "password");
 
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+    assertEquals(response.getStatusInfo(), Response.Status.UNAUTHORIZED);
   }
 
   @Test
@@ -184,8 +183,8 @@ public class FacebookResourceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testGetPhotosWithOauthException() {
-    when(facebookService.getFacebookUserPhotos()).thenThrow(FacebookOAuthException.class);
+  public void testGetPhotosWithExpiredOauth() {
+    when(facebookService.getFacebookUserPhotos()).thenReturn(null);
 
     Response response = resource.getPhotos(key, "Test", "password");
 
@@ -241,7 +240,7 @@ public class FacebookResourceTest {
 
     Response response = resource.getVideos(key, "Test", "password");
 
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+    assertEquals(response.getStatusInfo(), Response.Status.UNAUTHORIZED);
   }
 
   @Test
@@ -259,8 +258,8 @@ public class FacebookResourceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testGetVideosWithOauthException() {
-    when(facebookService.getFacebookUserVideos()).thenThrow(FacebookOAuthException.class);
+  public void testGetVideosWithExpiredOauth() {
+    when(facebookService.getFacebookUserVideos()).thenReturn(null);
 
     Response response = resource.getVideos(key, "Test", "password");
 
@@ -352,7 +351,7 @@ public class FacebookResourceTest {
     Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
         "Test", inputStream, contentDisposition, null);
 
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+    assertEquals(response.getStatusInfo(), Response.Status.UNAUTHORIZED);
   }
 
   @Test
@@ -473,7 +472,7 @@ public class FacebookResourceTest {
 
     Response response = resource.getExtendedToken(key, "Test", "password");
 
-    assertEquals(response.getStatusInfo(), Response.Status.INTERNAL_SERVER_ERROR);
+    assertEquals(response.getStatusInfo(), Response.Status.UNAUTHORIZED);
   }
 
   @Test
@@ -491,8 +490,8 @@ public class FacebookResourceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testGetExtendedTokenWithOauthException() {
-    when(facebookService.getFacebookExtendedToken()).thenThrow(FacebookOAuthException.class);
+  public void testGetExtendedTokenWithExpiredOauth() {
+    when(facebookService.getFacebookExtendedToken()).thenReturn(null);
 
     Response response = resource.getExtendedToken(key, "Test", "password");
 
@@ -536,8 +535,8 @@ public class FacebookResourceTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testGetOauthUrlWithOauthException() {
-    when(facebookService.getOauthUrl(anyString())).thenThrow(FacebookOAuthException.class);
+  public void testGetOauthUrlWithExpiredOauth() {
+    when(facebookService.getOauthUrl(anyString())).thenReturn(null);
 
     Response response = resource.getOauthUrl(key, "example.com");
 

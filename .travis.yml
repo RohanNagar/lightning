@@ -5,6 +5,10 @@ jdk:
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V --settings settings.xml
 script: mvn clean test jacoco:report coveralls:report
 
+branches:
+  only:
+    - master
+
 env:
   global:
     - secure: NCc5+WGnxpadS397/+kC9iUOULbP/TD9+37VzoBbLLLmOzEbaqJstLoVlugPOtt0yxqxPUCywjg37tMorM87MRwGbS5eWpKS6dMyLNDRdIhyMGAAFcb29DNTxFFQVvdYhyCvjnAgnaAX2NSkBpMgDL1BlqgdscGnuZPtoaFCJX8g82Y5IdBSlBoOvvVChwB1GWKoz2j+ooBD7WA2i89cbe6PQKqJI7XaetUb5whLJOkUunb2SMCK7ew3z6vBsXaP/3VVIzOYG6gGW4VxfBd28DCAOUEsaLAmPzNjZJ70u9L+zJlqQwJ3E2F9Anq6pb8n3Cl7V+S/iMloMYkqc10Ialke1evMyLgS+OaHr+8GZUTWhxWvkiZ/TWNLsgeQ8kUF9Bcxyfl6ran2lqXZFv4AKlchUIk6o/G3vvlEtfaCQq8OnzeyN2wTnFCHomQbfM0HOTXktQCB4e2i7MsltmNYQEv1WaxniiYiLPPsILKi9rdqWOy6gWQ0JLrWCS+eg2dffGdhlKruzthtGCrUgBYqdkajgxUgShIxA3y9/FBhEzz9fFShdzTY6yFrePYqVBWxrEYmjyMgLmg7kFJ7tObzvan2jW+BwIvmbcygJ9MH0vO4vG0Wj5fvfn7IVz7qS1dvChhPoBZcnmNNTKhd7aa6Xt+CXwV330wuoDvygJWITIc=

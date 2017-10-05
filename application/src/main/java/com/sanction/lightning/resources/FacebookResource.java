@@ -2,7 +2,6 @@ package com.sanction.lightning.resources;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.restfb.exception.FacebookOAuthException;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.exception.ThunderConnectionException;
 import com.sanction.lightning.facebook.FacebookService;
@@ -126,13 +125,12 @@ public class FacebookResource {
     FacebookService facebookService
         = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
-    FacebookUser facebookUser;
-    try {
-      facebookUser = facebookService.getFacebookUser();
-    } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for {}.", email, e);
+    FacebookUser facebookUser = facebookService.getFacebookUser();
+
+    if (facebookUser == null) {
+      LOG.error("Bad Facebook OAuth token for user {}.", email);
       return Response.status(Response.Status.NOT_FOUND)
-          .entity("Request rejected due to bad OAuth token.").build();
+          .entity("The OAuth token for the user was rejected.").build();
     }
 
     LOG.info("Successfully retrieved Facebook user information for {}.", email);
@@ -180,17 +178,16 @@ public class FacebookResource {
     FacebookService facebookService
         = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
-    List<FacebookPhoto> photoList;
-    try {
-      photoList = facebookService.getFacebookUserPhotos();
-    } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for {}.", email, e);
+    List<FacebookPhoto> photos = facebookService.getFacebookUserPhotos();
+
+    if (photos == null) {
+      LOG.error("Bad Facebook OAuth token for user {}.", email);
       return Response.status(Response.Status.NOT_FOUND)
-          .entity("Request rejected due to bad OAuth token.").build();
+          .entity("The OAuth token for the user was rejected.").build();
     }
 
     LOG.info("Successfully retrieved Facebook photo information for user {}.", email);
-    return Response.ok(photoList).build();
+    return Response.ok(photos).build();
   }
 
   /**
@@ -234,17 +231,16 @@ public class FacebookResource {
     FacebookService facebookService
         = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
-    List<FacebookVideo> videoList;
-    try {
-      videoList = facebookService.getFacebookUserVideos();
-    } catch (FacebookOAuthException e) {
-      LOG.error("Bad Facebook OAuth token for {}.", email, e);
+    List<FacebookVideo> videos = facebookService.getFacebookUserVideos();
+
+    if (videos == null) {
+      LOG.error("Bad Facebook OAuth token for user {}.", email);
       return Response.status(Response.Status.NOT_FOUND)
-          .entity("Request rejected due to bad OAuth token.").build();
+          .entity("The OAuth token for the user was rejected.").build();
     }
 
     LOG.info("Successfully retrieved Facebook video information for user {}.", email);
-    return Response.ok(videoList).build();
+    return Response.ok(videos).build();
   }
 
   /**
@@ -319,15 +315,11 @@ public class FacebookResource {
         facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
 
     // Get the name of the file if publishing media
-    String filename;
-    if (type.equals(PublishType.TEXT)) {
-      filename = null;
-    } else {
-      filename = contentDispositionHeader.getFileName();
-    }
+    String filename = !type.equals(PublishType.TEXT)
+        ? contentDispositionHeader.getFileName()
+        : null;
 
-    String uploadedFile = facebookService.publish(inputStream, type, message,
-        filename, videoTitle);
+    String uploadedFile = facebookService.publish(inputStream, type, message, filename, videoTitle);
 
     if (uploadedFile == null) {
       LOG.error("Error uploading to Facebook for {}.", email);
@@ -383,14 +375,15 @@ public class FacebookResource {
 
     if (extendedToken == null) {
       LOG.error("Bad Facebook OAuth Token for email {}.", email);
-      return Response.status(Response.Status.UNAUTHORIZED)
+      return Response.status(Response.Status.NOT_FOUND)
           .entity("Request rejected due to bad OAuth token.").build();
     }
 
-    // Set up the PilotUser with the extended token
+    // Set up the updated PilotUser with the extended token
     pilotUser = new PilotUser(pilotUser.getEmail(), pilotUser.getPassword(), extendedToken,
         pilotUser.getTwitterAccessSecret(), pilotUser.getTwitterAccessSecret());
 
+    // Update the user in Thunder
     try {
       thunderClient.updateUser(pilotUser, password);
     } catch (RetrofitError e) {
@@ -432,7 +425,7 @@ public class FacebookResource {
 
     if (permissionsUrl == null) {
       LOG.error("Something went wrong while getting the OAuth URL.");
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+      return Response.status(Response.Status.NOT_FOUND)
           .entity("Something went wrong, please try again later.").build();
     }
 
