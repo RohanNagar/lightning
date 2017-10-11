@@ -142,8 +142,7 @@ public class TwitterService {
 
       return new TwitterAccessToken(
           accessToken.getToken(),
-          accessToken.getTokenSecret(),
-          null);
+          accessToken.getTokenSecret());
     } catch (TwitterException e) {
       LOG.error("Unable to get OAuth tokens from Twitter. "
           + "Twitter error code: {}", e.getErrorCode(), e);

@@ -9,15 +9,12 @@ import java.util.StringJoiner;
 public class TwitterAccessToken {
   private final String accessToken;
   private final String accessSecret;
-  private final String oauthUrl;
 
   @JsonCreator
   public TwitterAccessToken(@JsonProperty("accessToken") String accessToken,
-                            @JsonProperty("accessSecret") String accessSecret,
-                            @JsonProperty String oauthUrl) {
+                            @JsonProperty("accessSecret") String accessSecret) {
     this.accessToken = accessToken;
     this.accessSecret = accessSecret;
-    this.oauthUrl = oauthUrl;
   }
 
   public String getAccessToken() {
@@ -26,10 +23,6 @@ public class TwitterAccessToken {
 
   public String getAccessSecret() {
     return accessSecret;
-  }
-
-  public String getOauthUrl() {
-    return oauthUrl;
   }
 
   @Override
