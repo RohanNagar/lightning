@@ -1,6 +1,8 @@
 package com.sanction.lightning.twitter;
 
 import com.sanction.lightning.models.PublishType;
+import com.sanction.lightning.models.twitter.TwitterAccessToken;
+import com.sanction.lightning.models.twitter.TwitterOAuthRequest;
 import com.sanction.lightning.models.twitter.TwitterUser;
 
 import java.io.InputStream;
@@ -14,6 +16,8 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.User;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterService {
@@ -114,11 +118,34 @@ public class TwitterService {
    * @param redirectUrl The URL that Twitter should redirect to after the user authenticates.
    * @return The URL to redirect to for authentication or {@code null} if unable to fetch the URL.
    */
-  public String getAuthorizationUrl(String redirectUrl) {
+  public TwitterOAuthRequest getAuthorizationUrl(String redirectUrl) {
     try {
-      return twitterClient.getOAuthRequestToken(redirectUrl).getAuthorizationURL();
+      RequestToken requestToken = twitterClient.getOAuthRequestToken(redirectUrl);
+
+      return new TwitterOAuthRequest(
+          requestToken.getToken(),
+          requestToken.getTokenSecret(),
+          requestToken.getAuthorizationURL());
     } catch (TwitterException e) {
       LOG.error("Unable to get authorization URL from Twitter. "
+          + "Twitter error code: {}", e.getErrorCode(), e);
+      return null;
+    }
+  }
+
+  public TwitterAccessToken getOAuthAccessToken(String requestToken,
+                                                String requestTokenSecret,
+                                                String oauthVerifier) {
+    try {
+      RequestToken token = new RequestToken(requestToken, requestTokenSecret);
+      AccessToken accessToken = twitterClient.getOAuthAccessToken(token, oauthVerifier);
+
+      return new TwitterAccessToken(
+          accessToken.getToken(),
+          accessToken.getTokenSecret(),
+          null);
+    } catch (TwitterException e) {
+      LOG.error("Unable to get OAuth tokens from Twitter. "
           + "Twitter error code: {}", e.getErrorCode(), e);
       return null;
     }
