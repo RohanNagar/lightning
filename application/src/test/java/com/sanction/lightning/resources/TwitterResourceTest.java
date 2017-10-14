@@ -3,6 +3,7 @@ package com.sanction.lightning.resources;
 import com.codahale.metrics.MetricRegistry;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.models.PublishType;
+import com.sanction.lightning.models.twitter.TwitterAccessToken;
 import com.sanction.lightning.models.twitter.TwitterOAuthRequest;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
@@ -192,16 +193,16 @@ public class TwitterResourceTest {
     assertEquals(result, Long.valueOf(1));
   }
 
-  /* OAuth Token Tests */
+  /* OAuth URL Tests */
   @Test
-  public void testGetOAuthTokenWithNullRedirect() {
+  public void testGetOAuthUrlWithNullRedirect() {
     Response response = resource.getOAuthUrl(key, null);
 
     assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
   }
 
   @Test
-  public void testGetOAuthTokenFailure() {
+  public void testGetOAuthUrlFailure() {
     when(service.getAuthorizationUrl(anyString())).thenReturn(null);
 
     Response response = resource.getOAuthUrl(key, "example.com");
@@ -210,7 +211,7 @@ public class TwitterResourceTest {
   }
 
   @Test
-  public void testGetOAuthTokenSuccess() {
+  public void testGetOAuthUrlSuccess() {
     TwitterOAuthRequest request = new TwitterOAuthRequest(
         "requestToken", "requestSecret", "twitter.com");
 
@@ -219,6 +220,51 @@ public class TwitterResourceTest {
 
     Response response = resource.getOAuthUrl(key, "example.com");
     TwitterOAuthRequest result = (TwitterOAuthRequest) response.getEntity();
+
+    assertEquals(response.getStatusInfo(), Response.Status.OK);
+    assertEquals(result, request);
+  }
+
+  /* OAuth Access Token Tests */
+  @Test
+  public void testGetAccessTokenWithNullRequestToken() {
+    Response response = resource.getOAuthAccessToken(key, null, "secret", "verifier");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetAccessTokenWithNullRequestSecret() {
+    Response response = resource.getOAuthAccessToken(key, "token", null, "verifier");
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetAccessTokenWithNullOAuthVerifier() {
+    Response response = resource.getOAuthAccessToken(key, "token", "secret", null);
+
+    assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testGetAccessTokenFailure() {
+    when(service.getOAuthAccessToken(anyString(), anyString(), anyString())).thenReturn(null);
+
+    Response response = resource.getOAuthAccessToken(key, "token", "secret", "verifier");
+
+    assertEquals(response.getStatusInfo(), Response.Status.SERVICE_UNAVAILABLE);
+  }
+
+  @Test
+  public void testGetAccessTokenSuccess() {
+    TwitterAccessToken request = new TwitterAccessToken("accessToken", "accessSecret");
+
+    when(service.getOAuthAccessToken(anyString(), anyString(), anyString()))
+        .thenReturn(request);
+
+    Response response = resource.getOAuthAccessToken(key, "token", "secret", "verifier");
+    TwitterAccessToken result = (TwitterAccessToken) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
     assertEquals(result, request);

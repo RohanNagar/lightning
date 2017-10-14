@@ -30,7 +30,6 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.RetrofitError;
 
 @Path("/twitter")
 @Produces(MediaType.APPLICATION_JSON)
@@ -246,11 +245,11 @@ public class TwitterResource {
    * @return The Twitter access token and access token secret, if successful.
    */
   @GET
-  @Path("/token")
-  public Response getOAuthToken(@Auth Key key,
-                                @QueryParam("oauth_request_token") String requestToken,
-                                @QueryParam("oauth_request_secret") String requestSecret,
-                                @QueryParam("oauth_verifier") String oauthVerifier) {
+  @Path("/accessToken")
+  public Response getOAuthAccessToken(@Auth Key key,
+                                      @QueryParam("oauth_request_token") String requestToken,
+                                      @QueryParam("oauth_request_secret") String requestSecret,
+                                      @QueryParam("oauth_verifier") String oauthVerifier) {
     tokenRequests.mark();
 
     if (requestToken == null || requestToken.equals("")) {
