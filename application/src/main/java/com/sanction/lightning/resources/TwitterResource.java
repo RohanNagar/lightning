@@ -4,6 +4,8 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.models.PublishType;
+import com.sanction.lightning.models.twitter.TwitterAccessToken;
+import com.sanction.lightning.models.twitter.TwitterOAuthRequest;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
@@ -41,6 +43,7 @@ public class TwitterResource {
   private final Meter usersRequests;
   private final Meter publishRequests;
   private final Meter oauthRequests;
+  private final Meter tokenRequests;
 
   /**
    * Constructs a new TwitterResource to handle Twitter HTTP requests.
@@ -65,6 +68,9 @@ public class TwitterResource {
     this.oauthRequests = metrics.meter(MetricRegistry.name(
         TwitterResource.class,
         "oauth-requests"));
+    this.tokenRequests = metrics.meter(MetricRegistry.name(
+        TwitterResource.class,
+        "token-requests"));
   }
 
   /**
@@ -216,15 +222,67 @@ public class TwitterResource {
     LOG.info("Attempting to retrieve Twitter OAuth URL.");
 
     TwitterService service = twitterServiceFactory.newTwitterService();
+    TwitterOAuthRequest oauthRequest = service.getAuthorizationUrl(redirectUrl);
 
-    String url = service.getAuthorizationUrl(redirectUrl);
-    if (url == null) {
+    if (oauthRequest == null) {
       LOG.error("Unable to build OAuth URL for Twitter.");
       return Response.status(Response.Status.SERVICE_UNAVAILABLE)
           .entity("Unable to retrieve OAuth URL from Twitter.").build();
     }
 
     LOG.info("Successfully built OAuth URL for Twitter.");
-    return Response.ok(url).build();
+    return Response.ok(oauthRequest).build();
+  }
+
+  /**
+   * Gets the Twitter Access Token information, given an existing request and the corresponding
+   * OAuth verifier.
+   *
+   * @param key The authentication credentials of the calling application.
+   * @param requestToken The original request token (from the /oauthUrl endpoint).
+   * @param requestSecret The original request token secret (from the /oauthUrl endpoint).
+   * @param oauthVerifier The OAuth verifier that was generated when the user authorized.
+   * @return The Twitter access token and access token secret, if successful.
+   */
+  @GET
+  @Path("/accessToken")
+  public Response getOAuthAccessToken(@Auth Key key,
+                                      @QueryParam("oauth_request_token") String requestToken,
+                                      @QueryParam("oauth_request_secret") String requestSecret,
+                                      @QueryParam("oauth_verifier") String oauthVerifier) {
+    tokenRequests.mark();
+
+    if (requestToken == null || requestToken.equals("")) {
+      LOG.warn("Cannot get OAuth access token without an original request token.");
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("The original OAuth request token is required.").build();
+    }
+
+    if (requestSecret == null || requestSecret.equals("")) {
+      LOG.warn("Cannot get OAuth access token without an original request secret.");
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("The original OAuth request token secret is required.").build();
+    }
+
+    if (oauthVerifier == null || oauthVerifier.equals("")) {
+      LOG.warn("Cannot get OAuth access token without an OAuth verifier.");
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("An OAuth verifier is required to get an OAuth access token.").build();
+    }
+
+    LOG.info("Attempting to get TwitterAccessToken information.");
+
+    TwitterService service = twitterServiceFactory.newTwitterService();
+    TwitterAccessToken accessToken = service.getOAuthAccessToken(
+        requestToken, requestSecret, oauthVerifier);
+
+    if (accessToken == null) {
+      LOG.error("Unable to get Twitter access token.");
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+          .entity("Unable to retrieve access token from Twitter.").build();
+    }
+
+    LOG.info("Successfully exchanged oauth verifier for access token information.");
+    return Response.ok(accessToken).build();
   }
 }

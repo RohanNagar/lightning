@@ -2,36 +2,19 @@ package com.sanction.lightning.models.twitter;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
+
+import java.util.Objects;
+import java.util.StringJoiner;
 
 public class TwitterUser {
-
-  @JsonProperty("id")
   private final long id;
-
-  @JsonProperty("favouritesCount")
   private final int favouritesCount;
-
-  @JsonProperty("followersCount")
   private final int followersCount;
-
-  @JsonProperty("createdAt")
   private final String createdAt;
-
-  @JsonProperty("location")
   private final String location;
-
-  @JsonProperty("name")
   private final String name;
-
-  @JsonProperty("screenName")
   private final String screenName;
-
-  @JsonProperty("profileImageUrl")
   private final String profileImageUrl;
-
-  @JsonProperty("verified")
   private final boolean verified;
 
   /**
@@ -115,7 +98,7 @@ public class TwitterUser {
     }
 
     TwitterUser other = (TwitterUser) obj;
-    return Objects.equal(this.id, other.id);
+    return Objects.equals(this.id, other.id);
   }
 
   @Override
@@ -125,12 +108,12 @@ public class TwitterUser {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("id", id)
-        .add("createdAt", createdAt)
-        .add("screenName", screenName)
-        .add("name", name)
-        .add("verified", verified)
+    return new StringJoiner(", ", "TwitterUser [", "]")
+        .add(String.format("id=%s", id))
+        .add(String.format("createdAt=%s", createdAt))
+        .add(String.format("screenName=%s", screenName))
+        .add(String.format("name=%s", name))
+        .add(String.format("verified=%s", verified))
         .toString();
   }
 }
