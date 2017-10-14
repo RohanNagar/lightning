@@ -3,6 +3,7 @@ package com.sanction.lightning.resources;
 import com.codahale.metrics.MetricRegistry;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.models.PublishType;
+import com.sanction.lightning.models.twitter.TwitterOAuthRequest;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
@@ -210,12 +211,16 @@ public class TwitterResourceTest {
 
   @Test
   public void testGetOAuthTokenSuccess() {
-    when(service.getAuthorizationUrl(anyString())).thenReturn("URL");
+    TwitterOAuthRequest request = new TwitterOAuthRequest(
+        "requestToken", "requestSecret", "twitter.com");
+
+    when(service.getAuthorizationUrl(anyString()))
+        .thenReturn(request);
 
     Response response = resource.getOAuthUrl(key, "example.com");
-    String url = (String) response.getEntity();
+    TwitterOAuthRequest result = (TwitterOAuthRequest) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(url, "URL");
+    assertEquals(result, request);
   }
 }

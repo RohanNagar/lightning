@@ -133,6 +133,15 @@ public class TwitterService {
     }
   }
 
+  /**
+   * Exchanges OAuth request information and an OAuth verifier for an access token and access
+   * token secret.
+   *
+   * @param requestToken The original request token.
+   * @param requestTokenSecret The original request token secret.
+   * @param oauthVerifier The OAuth verifier that was generated when the user authorized.
+   * @return The Twitter access token information or {@code null} on failure.
+   */
   public TwitterAccessToken getOAuthAccessToken(String requestToken,
                                                 String requestTokenSecret,
                                                 String oauthVerifier) {

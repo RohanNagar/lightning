@@ -10,6 +10,12 @@ public class TwitterAccessToken {
   private final String accessToken;
   private final String accessSecret;
 
+  /**
+   * Constructs a new TwitterAccessToken from the given parameters.
+   *
+   * @param accessToken The access token retrieved from Twitter.
+   * @param accessSecret The access token secret retrieved from Twitter.
+   */
   @JsonCreator
   public TwitterAccessToken(@JsonProperty("accessToken") String accessToken,
                             @JsonProperty("accessSecret") String accessSecret) {
