@@ -7,6 +7,7 @@ import com.sanction.lightning.exception.ThunderConnectionException;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.PublishType;
+import com.sanction.lightning.models.facebook.FacebookOAuthRequest;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
@@ -429,8 +430,10 @@ public class FacebookResource {
           .entity("Something went wrong, please try again later.").build();
     }
 
+    FacebookOAuthRequest authRequest = new FacebookOAuthRequest(permissionsUrl);
+
     LOG.info("Successfully built Facebook OAuth URL.");
-    return Response.ok(permissionsUrl).build();
+    return Response.ok(authRequest).build();
   }
 
   private PilotUser getPilotUser(String email, String password) {

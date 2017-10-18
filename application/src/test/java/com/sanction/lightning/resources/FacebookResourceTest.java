@@ -6,6 +6,7 @@ import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
 import com.sanction.lightning.models.PublishType;
+import com.sanction.lightning.models.facebook.FacebookOAuthRequest;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
@@ -545,12 +546,13 @@ public class FacebookResourceTest {
 
   @Test
   public void testGetOauthUrl() {
+    FacebookOAuthRequest expected = new FacebookOAuthRequest("Test");
     when(facebookService.getOauthUrl(anyString())).thenReturn("Test");
 
     Response response = resource.getOauthUrl(key, "example.com");
-    String string = (String) response.getEntity();
+    FacebookOAuthRequest authRequest = (FacebookOAuthRequest) response.getEntity();
 
     assertEquals(response.getStatusInfo(), Response.Status.OK);
-    assertEquals(string, "Test");
+    assertEquals(expected, authRequest);
   }
 }
