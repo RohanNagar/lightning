@@ -11,6 +11,7 @@ import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
 import com.sanction.thunder.ThunderClient;
+import com.sanction.thunder.models.Email;
 import com.sanction.thunder.models.PilotUser;
 
 import java.io.InputStream;
@@ -53,6 +54,8 @@ public class FacebookResourceTest {
     when(thunderClient.getUser(anyString(), anyString())).thenReturn(pilotUser);
 
     // Setup PilotUser
+    when(pilotUser.getEmail()).thenReturn(
+        new Email("test@sanctionco.com", false, "token"));
     when(pilotUser.getFacebookAccessToken()).thenReturn("fbAccessToken");
   }
 
@@ -506,7 +509,7 @@ public class FacebookResourceTest {
     when(error.getResponse()).thenReturn(new retrofit.client.Response("url", 404, "Not Found",
         Lists.newArrayList(), null));
     when(facebookService.getFacebookExtendedToken()).thenReturn("Test");
-    when(thunderClient.updateUser(any(PilotUser.class), anyString())).thenThrow(error);
+    when(thunderClient.updateUser(any(PilotUser.class), anyString(), anyString())).thenThrow(error);
 
     Response response = resource.getExtendedToken(key, "Test", "password");
 
@@ -516,7 +519,8 @@ public class FacebookResourceTest {
   @Test
   public void testGetExtendedToken() {
     when(facebookService.getFacebookExtendedToken()).thenReturn("Test");
-    when(thunderClient.updateUser(any(PilotUser.class), anyString())).thenReturn(pilotUser);
+    when(thunderClient.updateUser(any(PilotUser.class), anyString(), anyString()))
+        .thenReturn(pilotUser);
 
     Response response = resource.getExtendedToken(key, "Test", "password");
     String string = (String) response.getEntity();

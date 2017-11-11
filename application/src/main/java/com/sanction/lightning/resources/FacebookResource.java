@@ -386,7 +386,7 @@ public class FacebookResource {
 
     // Update the user in Thunder
     try {
-      thunderClient.updateUser(pilotUser, password);
+      thunderClient.updateUser(pilotUser, pilotUser.getEmail().getAddress(), password);
     } catch (RetrofitError e) {
       LOG.error("Unable to update PilotUser ({}) through Thunder.", email, e);
       return Response.status(e.getResponse().getStatus())
