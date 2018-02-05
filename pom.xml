@@ -30,7 +30,7 @@
     <twitter4j.version>4.0.6</twitter4j.version>
     <restfb.version>1.45.0</restfb.version>
     <jackson.api.version>2.7.8</jackson.api.version>
-    <jacoco.version>0.7.9</jacoco.version>
+    <jacoco.version>0.8.0</jacoco.version>
     <junit.version>4.12</junit.version>
     <mockito.version>1.10.19</mockito.version>
   </properties>
