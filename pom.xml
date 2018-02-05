@@ -32,7 +32,7 @@
     <jackson.api.version>2.7.8</jackson.api.version>
     <jacoco.version>0.7.9</jacoco.version>
     <junit.version>4.12</junit.version>
-    <mockito.version>1.10.19</mockito.version>
+    <mockito.version>2.13.0</mockito.version>
   </properties>
 
   <!-- Allows for releases into AWS S3. -->
