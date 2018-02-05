@@ -21,7 +21,7 @@
     <java.minimum.version>1.8</java.minimum.version>
 
     <!-- Dependency versions. -->
-    <checkstyle.version>7.5.1</checkstyle.version>
+    <checkstyle.version>8.8</checkstyle.version>
     <coveralls.version>4.3.0</coveralls.version>
     <dagger.version>2.9</dagger.version>
     <dropwizard.version>1.0.6</dropwizard.version>
