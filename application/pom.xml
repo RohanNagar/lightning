@@ -84,7 +84,7 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.sanction.thunder</groupId>
+      <groupId>com.github.RohanNagar.thunder</groupId>
       <artifactId>client</artifactId>
     </dependency>
     <dependency>

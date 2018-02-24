@@ -26,7 +26,7 @@
     <dagger.version>2.9</dagger.version>
     <dropwizard.version>1.0.6</dropwizard.version>
     <guava.version>21.0</guava.version>
-    <thunder.version>1.0.0</thunder.version>
+    <thunder.version>v1.0.0</thunder.version>
     <twitter4j.version>4.0.6</twitter4j.version>
     <restfb.version>1.45.0</restfb.version>
     <jackson.api.version>2.7.8</jackson.api.version>
@@ -144,18 +144,11 @@
     </extensions>
   </build>
 
-  <!-- Allow downloading of dependencies from S3. -->
+  <!-- Allow downloading of dependencies from JitPack. -->
   <repositories>
     <repository>
-      <id>maven-s3-release-repo</id>
-      <name>S3 Release Repository</name>
-      <url>s3://artifacts.sanction.com/maven/releases</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
 
@@ -177,6 +170,11 @@
         <version>${jackson.api.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.github.RohanNagar.thunder</groupId>
+        <artifactId>client</artifactId>
+        <version>${thunder.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.dagger</groupId>
         <artifactId>dagger</artifactId>
         <version>${dagger.version}</version>
@@ -195,11 +193,6 @@
         <groupId>com.restfb</groupId>
         <artifactId>restfb</artifactId>
         <version>${restfb.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sanction.thunder</groupId>
-        <artifactId>client</artifactId>
-        <version>${thunder.version}</version>
       </dependency>
       <dependency>
         <groupId>io.dropwizard</groupId>
