@@ -15,6 +15,7 @@ public class LightningModule {
   private final LightningConfiguration config;
 
   /**
+   * Instantiates a new LightningModule object with the specified parameters.
    *
    * @param thunderClient Client for connecting to thunder.
    * @param config Configuration class for Lightning.
