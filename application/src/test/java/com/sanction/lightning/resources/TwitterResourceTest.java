@@ -20,8 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +52,9 @@ public class TwitterResourceTest {
     // Setup PilotUser
     when(pilotUser.getTwitterAccessToken()).thenReturn("twitterAccessToken");
     when(pilotUser.getTwitterAccessSecret()).thenReturn("twitterAccessSecret");
+
+    // Setup Content
+    when(contentDisposition.getFileName()).thenReturn("test-filename.png");
   }
 
   /* User Tests */
@@ -142,7 +145,7 @@ public class TwitterResourceTest {
   @Test
   public void testPublishWithNullTwitterResponse() {
     when(service.publish(any(PublishType.class), any(String.class),
-        any(String.class), any(InputStream.class)))
+        any(), any(InputStream.class)))
         .thenReturn(null);
 
     Response response = resource.publish(key, "Test", "password",
@@ -153,7 +156,7 @@ public class TwitterResourceTest {
 
   @Test
   public void testPublishPhotoWithNullMessage() {
-    when(service.publish(any(PublishType.class), any(String.class),
+    when(service.publish(any(PublishType.class), any(),
         any(String.class), any(InputStream.class)))
         .thenReturn(1L);
 
@@ -168,7 +171,7 @@ public class TwitterResourceTest {
   @Test
   public void testPublishTextWithNullInputStream() {
     when(service.publish(any(PublishType.class), any(String.class),
-        any(String.class), any(InputStream.class)))
+        any(), any()))
         .thenReturn(1L);
 
     Response response = resource.publish(key, "Test", "password",

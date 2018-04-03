@@ -24,8 +24,8 @@ import org.junit.Test;
 import retrofit.RetrofitError;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +57,9 @@ public class FacebookResourceTest {
     when(pilotUser.getEmail()).thenReturn(
         new Email("test@sanctionco.com", false, "token"));
     when(pilotUser.getFacebookAccessToken()).thenReturn("fbAccessToken");
+
+    // Setup Content
+    when(contentDisposition.getFileName()).thenReturn("test-filename.png");
   }
 
   /* User Tests */
@@ -386,9 +389,8 @@ public class FacebookResourceTest {
 
   @Test
   public void testPublishTextWithNullInputStream() {
-    when(facebookService.publish(any(InputStream.class),
-        any(PublishType.class), any(String.class), any(String.class),
-        any(String.class))).thenReturn("Test");
+    when(facebookService.publish(any(), any(PublishType.class), any(String.class),
+        any(), any())).thenReturn("Test");
 
     Response response = resource.publish(key, "Test", "password", PublishType.TEXT,
         "Test", null, null, null);
@@ -402,7 +404,7 @@ public class FacebookResourceTest {
   public void testPublishPhotoWithNullVideoTitle() {
     when(facebookService.publish(any(InputStream.class),
         any(PublishType.class), any(String.class), any(String.class),
-        any(String.class))).thenReturn("Test");
+        any())).thenReturn("Test");
 
     Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
         "Test", inputStream, contentDisposition, null);
@@ -415,7 +417,7 @@ public class FacebookResourceTest {
   @Test
   public void testPublishPhotoWithNullMessage() {
     when(facebookService.publish(any(InputStream.class),
-        any(PublishType.class), any(String.class), any(String.class),
+        any(PublishType.class), any(), any(String.class),
         any(String.class))).thenReturn("Test");
 
     Response response = resource.publish(key, "Test", "password", PublishType.PHOTO,
