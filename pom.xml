@@ -29,13 +29,13 @@
     <release-plugin.version>2.5.3</release-plugin.version>
 
     <!-- Dependency versions. -->
-    <dagger.version>2.9</dagger.version>
-    <dropwizard.version>1.0.6</dropwizard.version>
+    <dagger.version>2.13</dagger.version>
+    <dropwizard.version>1.3.0</dropwizard.version>
     <guava.version>21.0</guava.version>
     <thunder.version>v1.0.0</thunder.version>
     <twitter4j.version>4.0.6</twitter4j.version>
-    <restfb.version>1.45.0</restfb.version>
-    <jackson.api.version>2.7.8</jackson.api.version>
+    <restfb.version>1.49.0</restfb.version>
+    <jackson.api.version>2.9.5</jackson.api.version>
     <junit.version>4.12</junit.version>
     <mockito.version>1.10.19</mockito.version>
   </properties>
