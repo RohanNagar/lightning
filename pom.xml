@@ -37,7 +37,7 @@
     <restfb.version>1.49.0</restfb.version>
     <jackson.api.version>2.9.6</jackson.api.version>
     <junit.version>4.12</junit.version>
-    <mockito.version>2.20.1</mockito.version>
+    <mockito.version>2.21.0</mockito.version>
   </properties>
 
   <!-- Allows for releases into AWS S3. -->
