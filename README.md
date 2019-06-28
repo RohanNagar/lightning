@@ -1,7 +1,7 @@
 <img align="left" src="application/src/main/resources/logo.png">
 
 # Lightning
-[![Build Status](https://travis-ci.org/RohanNagar/lightning.svg?branch=master)](https://travis-ci.org/RohanNagar/lightning)
+[![Build Status](https://travis-ci.com/RohanNagar/lightning.svg?branch=master)](https://travis-ci.com/RohanNagar/lightning)
 [![Coverage Status](https://coveralls.io/repos/github/RohanNagar/lightning/badge.svg?branch=master)](https://coveralls.io/github/RohanNagar/lightning?branch=master)
 [![Version](https://img.shields.io/badge/version-v0.1.0-7f8c8d.svg)](https://github.com/RohanNagar/lightning/releases)
 [![Twitter](https://img.shields.io/badge/twitter-%40RohanNagar22-00aced.svg)](http://twitter.com/RohanNagar22)
