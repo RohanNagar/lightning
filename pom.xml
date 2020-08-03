@@ -35,7 +35,7 @@
     <thunder.version>v1.0.0</thunder.version>
     <twitter4j.version>4.0.7</twitter4j.version>
     <restfb.version>1.49.0</restfb.version>
-    <jackson.api.version>2.11.1</jackson.api.version>
+    <jackson.api.version>2.11.2</jackson.api.version>
     <junit.version>4.13</junit.version>
     <mockito.version>3.4.6</mockito.version>
   </properties>
