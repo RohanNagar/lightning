@@ -34,7 +34,7 @@
     <guava.version>29.0-jre</guava.version>
     <thunder.version>v1.0.0</thunder.version>
     <twitter4j.version>4.0.7</twitter4j.version>
-    <restfb.version>1.49.0</restfb.version>
+    <restfb.version>3.11.0</restfb.version>
     <jackson.api.version>2.11.3</jackson.api.version>
     <junit.version>4.13</junit.version>
     <mockito.version>3.5.13</mockito.version>
