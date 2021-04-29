@@ -1,0 +1,38 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: com.google.dagger:dagger-compiler
+    versions:
+    - "2.33"
+    - 2.34.1
+  - dependency-name: com.google.dagger:dagger
+    versions:
+    - "2.33"
+    - 2.34.1
+  - dependency-name: com.restfb:restfb
+    versions:
+    - 3.13.0
+    - 3.14.0
+    - 3.15.0
+    - 3.16.0
+  - dependency-name: io.dropwizard:dropwizard-forms
+    versions:
+    - 2.0.18
+    - 2.0.19
+    - 2.0.20
+  - dependency-name: io.dropwizard:dropwizard-core
+    versions:
+    - 2.0.18
+    - 2.0.19
+    - 2.0.20
+  - dependency-name: io.dropwizard:dropwizard-auth
+    versions:
+    - 2.0.18
+    - 2.0.19
+    - 2.0.20
