@@ -30,7 +30,7 @@
 
     <!-- Dependency versions. -->
     <dagger.version>2.37</dagger.version>
-    <dropwizard.version>1.3.17</dropwizard.version>
+    <dropwizard.version>2.0.22</dropwizard.version>
     <guava.version>30.1.1-jre</guava.version>
     <thunder.version>v1.0.0</thunder.version>
     <twitter4j.version>4.0.7</twitter4j.version>
