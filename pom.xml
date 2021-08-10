@@ -40,6 +40,15 @@
     <mockito.version>3.11.2</mockito.version>
   </properties>
 
+  <!-- Google Maven Repo is required for Dagger 2.38 and up -->
+   <repositories>
+     <repository>
+       <id>google-maven</id>
+       <name>Google Maven Repo</name>
+       <url>https://maven.google.com</url>
+     </repository>
+   </repositories>
+
   <!-- Allows for releases into AWS S3. -->
   <distributionManagement>
     <repository>
