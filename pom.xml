@@ -39,7 +39,7 @@
     <junit.version>4.13.2</junit.version>
     <mockito.version>3.11.2</mockito.version>
   </properties>
- 
+
   <!-- Google Maven Repo is required for Dagger 2.38 and up -->
    <repositories>
      <repository>
