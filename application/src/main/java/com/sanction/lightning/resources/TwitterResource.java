@@ -9,8 +9,8 @@ import com.sanction.lightning.models.twitter.TwitterOAuthRequest;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
-import com.sanction.thunder.ThunderClient;
-import com.sanction.thunder.models.PilotUser;
+import com.sanctionco.thunder.ThunderClient;
+import com.sanctionco.thunder.models.User;
 import io.dropwizard.auth.Auth;
 
 import java.io.InputStream;
@@ -102,10 +102,10 @@ public class TwitterResource {
 
     LOG.info("Attempting to get Twitter user information for user {}.", email);
 
-    PilotUser pilotUser = thunderClient.getUser(email, password);
+    User thunderUser = thunderClient.getUser(email, password).join();
     TwitterService service = twitterServiceFactory.newTwitterService(
-        pilotUser.getTwitterAccessToken(),
-        pilotUser.getTwitterAccessSecret());
+        thunderUser.getProperties().get("twitter-access-token").toString(),
+        thunderUser.getProperties().get("twitter-access-secret").toString());
 
     TwitterUser user = service.getTwitterUser();
     if (user == null) {
@@ -176,10 +176,10 @@ public class TwitterResource {
 
     LOG.info("Attempting to publish {} to Twitter for {}.", type, email);
 
-    PilotUser pilotUser = thunderClient.getUser(email, password);
+    User thunderUser = thunderClient.getUser(email, password).join();
     TwitterService service = twitterServiceFactory.newTwitterService(
-        pilotUser.getTwitterAccessToken(),
-        pilotUser.getTwitterAccessSecret());
+        thunderUser.getProperties().get("twitter-access-token").toString(),
+        thunderUser.getProperties().get("twitter-access-secret").toString());
 
     // Get the name of the file if publishing media
     String filename;

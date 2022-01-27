@@ -11,8 +11,8 @@ import com.sanction.lightning.models.facebook.FacebookOAuthRequest;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
-import com.sanction.thunder.ThunderClient;
-import com.sanction.thunder.models.PilotUser;
+import com.sanctionco.thunder.ThunderClient;
+import com.sanctionco.thunder.models.User;
 import io.dropwizard.auth.Auth;
 
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit.RetrofitError;
+import retrofit2.HttpException;
 
 @Path("/facebook")
 @Produces(MediaType.APPLICATION_JSON)
@@ -115,16 +115,16 @@ public class FacebookResource {
 
     LOG.info("Attempting to get Facebook user information for {}.", email);
 
-    PilotUser pilotUser;
+    User thunderUser;
     try {
-      pilotUser = getPilotUser(email, password);
+      thunderUser = getThunderUser(email, password);
     } catch (ThunderConnectionException e) {
       LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
-    FacebookService facebookService
-        = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService = facebookServiceFactory.newFacebookService(
+        thunderUser.getProperties().get("facebook-access-token").toString());
 
     FacebookUser facebookUser = facebookService.getFacebookUser();
 
@@ -168,16 +168,16 @@ public class FacebookResource {
 
     LOG.info("Attempting to get Facebook photos for user {}.", email);
 
-    PilotUser pilotUser;
+    User thunderUser;
     try {
-      pilotUser = getPilotUser(email, password);
+      thunderUser = getThunderUser(email, password);
     } catch (ThunderConnectionException e) {
       LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
-    FacebookService facebookService
-        = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService = facebookServiceFactory.newFacebookService(
+        thunderUser.getProperties().get("facebook-access-token").toString());
 
     List<FacebookPhoto> photos = facebookService.getFacebookUserPhotos();
 
@@ -221,16 +221,16 @@ public class FacebookResource {
 
     LOG.info("Attempting to get Facebook video information for user {}.", email);
 
-    PilotUser pilotUser;
+    User thunderUser;
     try {
-      pilotUser = getPilotUser(email, password);
+      thunderUser = getThunderUser(email, password);
     } catch (ThunderConnectionException e) {
       LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
-    FacebookService facebookService
-        = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService = facebookServiceFactory.newFacebookService(
+        thunderUser.getProperties().get("facebook-access-token").toString());
 
     List<FacebookVideo> videos = facebookService.getFacebookUserVideos();
 
@@ -304,16 +304,16 @@ public class FacebookResource {
 
     LOG.info("Attempting to publish {} to Facebook for user {}.", type, email);
 
-    PilotUser pilotUser;
+    User thunderUser;
     try {
-      pilotUser = getPilotUser(email, password);
+      thunderUser = getThunderUser(email, password);
     } catch (ThunderConnectionException e) {
       LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
-    FacebookService facebookService =
-        facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService = facebookServiceFactory.newFacebookService(
+        thunderUser.getProperties().get("facebook-access-token").toString());
 
     // Get the name of the file if publishing media
     String filename = !type.equals(PublishType.TEXT)
@@ -361,16 +361,16 @@ public class FacebookResource {
 
     LOG.info("Attempting to extend Facebook OAuth token for user {}.", email);
 
-    PilotUser pilotUser;
+    User thunderUser;
     try {
-      pilotUser = getPilotUser(email, password);
+      thunderUser = getThunderUser(email, password);
     } catch (ThunderConnectionException e) {
       LOG.error("Unable to retrieve PilotUser ({}) from Thunder.", email);
       return e.getResponse();
     }
 
-    FacebookService facebookService
-        = facebookServiceFactory.newFacebookService(pilotUser.getFacebookAccessToken());
+    FacebookService facebookService = facebookServiceFactory.newFacebookService(
+        thunderUser.getProperties().get("facebook-access-token").toString());
 
     String extendedToken = facebookService.getFacebookExtendedToken();
 
@@ -381,16 +381,17 @@ public class FacebookResource {
     }
 
     // Set up the updated PilotUser with the extended token
-    pilotUser = new PilotUser(pilotUser.getEmail(), pilotUser.getPassword(), extendedToken,
-        pilotUser.getTwitterAccessSecret(), pilotUser.getTwitterAccessSecret());
+    thunderUser.getProperties().put("facebook-access-token", extendedToken);
+    thunderUser = new User(
+        thunderUser.getEmail(), thunderUser.getPassword(), thunderUser.getProperties());
 
     // Update the user in Thunder
     try {
-      thunderClient.updateUser(pilotUser, pilotUser.getEmail().getAddress(), password);
-    } catch (RetrofitError e) {
-      LOG.error("Unable to update PilotUser ({}) through Thunder.", email, e);
-      return Response.status(e.getResponse().getStatus())
-          .entity(e.getResponse().getReason())
+      thunderClient.updateUser(thunderUser, thunderUser.getEmail().getAddress(), password);
+    } catch (Exception e) {
+      LOG.error("Unable to update User ({}) through Thunder.", email, e);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity(e.getMessage())
           .build();
     }
 
@@ -436,39 +437,19 @@ public class FacebookResource {
     return Response.ok(authRequest).build();
   }
 
-  private PilotUser getPilotUser(String email, String password) {
-    PilotUser pilotUser;
+  private User getThunderUser(String email, String password) {
+    User user;
 
     try {
-      pilotUser = thunderClient.getUser(email, password);
-    } catch (RetrofitError e) {
-      // If the error has a null response, then Thunder is down.
-      if (e.getResponse() == null) {
-        LOG.error("Thunder is currently unavailable.");
-        throw new ThunderConnectionException(
-            Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                .entity("Error: " + e.getMessage())
-                .build());
-      }
-
-      // If unauthorized, the user password was incorrect. The request is unauthorized.
-      if (e.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-        LOG.error("Incorrect user password, unable to access Thunder"
-            + " (or, less likely, bad API keys).");
-        throw new ThunderConnectionException(
-            Response.status(Response.Status.UNAUTHORIZED)
-                .entity("Error: " + e.getMessage())
-                .build());
-      }
-
-      // Otherwise, supply the response that Thunder gave.
-      LOG.error("Error accessing Thunder: {}", e.getResponse().getReason());
+      user = thunderClient.getUser(email, password).join();
+    } catch (HttpException e) {
+      LOG.error("Error accessing Thunder: {}", e.getMessage());
       throw new ThunderConnectionException(
-          Response.status(e.getResponse().getStatus())
-              .entity(e.getResponse().getReason())
+          Response.status(Response.Status.SERVICE_UNAVAILABLE)
+              .entity(e.getMessage())
               .build());
     }
 
-    return pilotUser;
+    return user;
   }
 }

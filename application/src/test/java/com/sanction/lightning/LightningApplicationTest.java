@@ -54,7 +54,7 @@ public class LightningApplicationTest {
     when(config.getTwitterConfiguration()).thenReturn(twitterConfig);
 
     // ThunderConfiguration
-    when(thunderConfig.getEndpoint()).thenReturn("endpoint");
+    when(thunderConfig.getEndpoint()).thenReturn("https://endpoint");
     when(thunderConfig.getUserKey()).thenReturn("userKey");
     when(thunderConfig.getUserSecret()).thenReturn("userSecret");
   }

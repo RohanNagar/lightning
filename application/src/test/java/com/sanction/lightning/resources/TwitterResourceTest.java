@@ -8,10 +8,13 @@ import com.sanction.lightning.models.twitter.TwitterOAuthRequest;
 import com.sanction.lightning.models.twitter.TwitterUser;
 import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
-import com.sanction.thunder.ThunderClient;
-import com.sanction.thunder.models.PilotUser;
+import com.sanctionco.thunder.ThunderClient;
+import com.sanctionco.thunder.models.User;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.ws.rs.core.Response;
 
@@ -34,7 +37,7 @@ public class TwitterResourceTest {
   private final FormDataContentDisposition contentDisposition =
       mock(FormDataContentDisposition.class);
 
-  private final PilotUser pilotUser = mock(PilotUser.class);
+  private final User user = mock(User.class);
   private final Key key = mock(Key.class);
 
   private final TwitterResource resource = new TwitterResource(thunderClient, metrics,
@@ -47,11 +50,15 @@ public class TwitterResourceTest {
     when(serviceFactory.newTwitterService(anyString(), anyString())).thenReturn(service);
 
     // Setup ThunderClient
-    when(thunderClient.getUser(anyString(), anyString())).thenReturn(pilotUser);
+    when(thunderClient.getUser(anyString(), anyString()))
+        .thenReturn(CompletableFuture.completedFuture(user));
 
-    // Setup PilotUser
-    when(pilotUser.getTwitterAccessToken()).thenReturn("twitterAccessToken");
-    when(pilotUser.getTwitterAccessSecret()).thenReturn("twitterAccessSecret");
+    // Setup User
+    Map<String, Object> properties = new HashMap<>();
+    properties.put("twitter-access-token", "twitterAccessToken");
+    properties.put("twitter-access-secret", "twitterAccessSecret");
+
+    when(user.getProperties()).thenReturn(properties);
 
     // Setup Content
     when(contentDisposition.getFileName()).thenReturn("test-filename.png");

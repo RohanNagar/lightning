@@ -3,8 +3,7 @@ package com.sanction.lightning;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookModule;
 import com.sanction.lightning.twitter.TwitterModule;
-import com.sanction.thunder.ThunderBuilder;
-import com.sanction.thunder.ThunderClient;
+import com.sanctionco.thunder.ThunderClient;
 
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -28,11 +27,12 @@ public class LightningApplication extends Application<LightningConfiguration> {
   @Override
   public void run(LightningConfiguration config, Environment env) {
     // Set up Thunder client
-    ThunderBuilder thunderBuilder = new ThunderBuilder(
-        config.getThunderConfiguration().getEndpoint(),
-        config.getThunderConfiguration().getUserKey(),
-        config.getThunderConfiguration().getUserSecret());
-    ThunderClient thunderClient = thunderBuilder.newThunderClient();
+    ThunderClient thunderClient = ThunderClient.builder()
+        .endpoint(config.getThunderConfiguration().getEndpoint())
+        .authentication(
+            config.getThunderConfiguration().getUserKey(),
+            config.getThunderConfiguration().getUserSecret())
+        .build();
 
     LightningComponent component = DaggerLightningComponent.builder()
         .facebookModule(new FacebookModule(config.getFacebookConfiguration()))
