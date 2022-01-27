@@ -8,8 +8,8 @@ import com.sanction.lightning.resources.FacebookResource;
 import com.sanction.lightning.resources.TwitterResource;
 import com.sanction.lightning.twitter.TwitterConfiguration;
 
-import io.dropwizard.Bundle;
 import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -67,7 +67,7 @@ public class LightningApplicationTest {
 
     application.initialize(bootstrap);
 
-    verify(bootstrap, times(1)).addBundle(any(Bundle.class));
+    verify(bootstrap, times(1)).addBundle(any(MultiPartBundle.class));
   }
 
   @Test
