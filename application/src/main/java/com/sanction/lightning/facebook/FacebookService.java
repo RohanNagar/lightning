@@ -12,9 +12,8 @@ import com.restfb.exception.FacebookException;
 import com.restfb.exception.FacebookOAuthException;
 import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
-import com.restfb.scope.ExtendedPermissions;
+import com.restfb.scope.FacebookPermissions;
 import com.restfb.scope.ScopeBuilder;
-import com.restfb.scope.UserDataPermissions;
 
 import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class FacebookService {
   private static final Logger LOG = LoggerFactory.getLogger(FacebookService.class);
-  private static final Version VERSION = Version.VERSION_2_10;
+  private static final Version VERSION = Version.VERSION_12_0;
 
   private final DefaultFacebookClient client;
   private final String appId;
@@ -97,20 +96,20 @@ public class FacebookService {
     }
 
     // Get the data from the JsonObject
-    JsonArray photosArray = photos.getJsonArray("data");
+    JsonArray photosArray = photos.get("data").asArray();
     List<FacebookPhoto> photoList = Lists.newArrayList();
 
     // JSON string to FacebookPhotoDetail conversion
     DefaultJsonMapper mapper = new DefaultJsonMapper();
 
-    for (int i = 0; i < photosArray.length(); i++) {
-      JsonObject obj = photosArray.getJsonObject(i);
+    for (int i = 0; i < photosArray.size(); i++) {
+      JsonObject obj = photosArray.get(i).asObject();
 
-      List<FacebookPhotoDetail> detailList = mapper.toJavaList(obj.getString("images"),
+      List<FacebookPhotoDetail> detailList = mapper.toJavaList(obj.getString("images", "[]"),
           FacebookPhotoDetail.class);
       FacebookPhotoDetail detail = detailList.get(0);
 
-      FacebookPhoto photo = new FacebookPhoto(obj.getString("id"), detail.getUri(),
+      FacebookPhoto photo = new FacebookPhoto(obj.getString("id", null), detail.getUri(),
           detail.getHeight(), detail.getWidth());
       photoList.add(photo);
     }
@@ -136,13 +135,15 @@ public class FacebookService {
       return null;
     }
 
-    JsonArray videoArray = videos.getJsonArray("data");
+    JsonArray videoArray = videos.get("data").asArray();
     List<FacebookVideo> videoList = Lists.newArrayList();
 
-    for (int i = 0; i < videoArray.length() - 1; i++) {
-      JsonObject obj = videoArray.getJsonObject(i);
+    for (int i = 0; i < videoArray.size() - 1; i++) {
+      JsonObject obj = videoArray.get(i).asObject();
 
-      FacebookVideo vid = new FacebookVideo(obj.getString("id"), obj.getString("source"));
+      FacebookVideo vid = new FacebookVideo(
+          obj.getString("id", null),
+          obj.getString("source", null));
       videoList.add(vid);
     }
 
@@ -184,7 +185,7 @@ public class FacebookService {
 
           response = client.publish(endpoint, JsonObject.class,
               BinaryAttachment.with(fileName, inputStream),
-              parameters.toArray(new Parameter[parameters.size()]));
+              parameters.toArray(new Parameter[0]));
           break;
 
         case VIDEO:
@@ -194,7 +195,7 @@ public class FacebookService {
 
           response = client.publish(endpoint, JsonObject.class,
               BinaryAttachment.with(fileName, inputStream),
-              parameters.toArray(new Parameter[parameters.size()]));
+              parameters.toArray(new Parameter[0]));
           break;
 
         default:
@@ -221,11 +222,10 @@ public class FacebookService {
    */
   public String getOauthUrl(String redirectUrl) {
     ScopeBuilder scopeBuilder = new ScopeBuilder()
-        .addPermission(UserDataPermissions.USER_PHOTOS)
-        .addPermission(UserDataPermissions.USER_VIDEOS)
-        .addPermission(UserDataPermissions.USER_POSTS)
-        .addPermission(UserDataPermissions.USER_ACTIONS_VIDEO)
-        .addPermission(ExtendedPermissions.PUBLISH_ACTIONS);
+        .addPermission(FacebookPermissions.USER_PHOTOS)
+        .addPermission(FacebookPermissions.USER_VIDEOS)
+        .addPermission(FacebookPermissions.USER_POSTS)
+        .addPermission(FacebookPermissions.PUBLISH_VIDEO);
 
     try {
       return client.getLoginDialogUrl(appId, redirectUrl, scopeBuilder,
