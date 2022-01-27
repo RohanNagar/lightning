@@ -18,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <java.minimum.version>1.8</java.minimum.version>
+    <java.minimum.version>17</java.minimum.version>
 
     <!-- Plugin versions -->
     <checkstyle.version>8.24</checkstyle.version>
@@ -152,12 +152,6 @@
   </build>
 
   <repositories>
-    <!-- Allow downloading of dependencies from JitPack. -->
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-
     <!-- Google Maven Repo is required for Dagger 2.38 and up -->
     <repository>
       <id>google-maven</id>
