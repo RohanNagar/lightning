@@ -11,10 +11,10 @@ import com.sanction.lightning.twitter.TwitterService;
 import com.sanction.lightning.twitter.TwitterServiceFactory;
 import com.sanctionco.thunder.ThunderClient;
 import com.sanctionco.thunder.models.User;
+
 import io.dropwizard.auth.Auth;
 
 import java.io.InputStream;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

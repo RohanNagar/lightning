@@ -1,9 +1,9 @@
 package com.sanction.lightning.authentication;
 
 import com.sanction.lightning.LightningConfiguration;
+
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
-
 import io.dropwizard.auth.basic.BasicCredentials;
 
 import java.util.List;

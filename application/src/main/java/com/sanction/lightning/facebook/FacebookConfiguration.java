@@ -1,6 +1,7 @@
 package com.sanction.lightning.facebook;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class FacebookConfiguration {

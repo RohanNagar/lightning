@@ -13,12 +13,12 @@ import com.sanction.lightning.models.facebook.FacebookUser;
 import com.sanction.lightning.models.facebook.FacebookVideo;
 import com.sanctionco.thunder.ThunderClient;
 import com.sanctionco.thunder.models.User;
+
 import io.dropwizard.auth.Auth;
 
 import java.io.InputStream;
 import java.util.List;
 import javax.inject.Inject;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,6 +34,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import retrofit2.HttpException;
 
 @Path("/facebook")

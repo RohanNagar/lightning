@@ -1,32 +1,21 @@
 package com.sanction.lightning.resources;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.Lists;
 import com.sanction.lightning.authentication.Key;
 import com.sanction.lightning.facebook.FacebookService;
 import com.sanction.lightning.facebook.FacebookServiceFactory;
-import com.sanction.lightning.models.PublishType;
-import com.sanction.lightning.models.facebook.FacebookOAuthRequest;
-import com.sanction.lightning.models.facebook.FacebookPhoto;
-import com.sanction.lightning.models.facebook.FacebookUser;
-import com.sanction.lightning.models.facebook.FacebookVideo;
 import com.sanctionco.thunder.ThunderClient;
 import com.sanctionco.thunder.models.Email;
 import com.sanctionco.thunder.models.User;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Before;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

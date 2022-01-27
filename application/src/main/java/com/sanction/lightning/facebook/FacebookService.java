@@ -1,7 +1,6 @@
 package com.sanction.lightning.facebook;
 
 import com.google.common.collect.Lists;
-
 import com.restfb.BinaryAttachment;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.DefaultJsonMapper;
@@ -14,7 +13,6 @@ import com.restfb.json.JsonArray;
 import com.restfb.json.JsonObject;
 import com.restfb.scope.FacebookPermissions;
 import com.restfb.scope.ScopeBuilder;
-
 import com.sanction.lightning.models.PublishType;
 import com.sanction.lightning.models.facebook.FacebookPhoto;
 import com.sanction.lightning.models.facebook.FacebookPhotoDetail;

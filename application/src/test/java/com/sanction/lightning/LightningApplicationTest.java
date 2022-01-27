@@ -7,6 +7,7 @@ import com.sanction.lightning.facebook.FacebookConfiguration;
 import com.sanction.lightning.resources.FacebookResource;
 import com.sanction.lightning.resources.TwitterResource;
 import com.sanction.lightning.twitter.TwitterConfiguration;
+
 import io.dropwizard.Bundle;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
