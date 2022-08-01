@@ -29,7 +29,7 @@
     <release-plugin.version>2.5.3</release-plugin.version>
 
     <!-- Dependency versions. -->
-    <dagger.version>2.43</dagger.version>
+    <dagger.version>2.43.1</dagger.version>
     <dropwizard.version>2.1.1</dropwizard.version>
     <guava.version>31.1-jre</guava.version>
     <thunder.version>3.1.0</thunder.version>
