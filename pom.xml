@@ -25,7 +25,7 @@
     <checkstyle-plugin.version>3.3.0</checkstyle-plugin.version>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <coveralls.version>4.3.0</coveralls.version>
-    <jacoco.version>0.8.10</jacoco.version>
+    <jacoco.version>0.8.11</jacoco.version>
     <release-plugin.version>3.0.1</release-plugin.version>
 
     <!-- Dependency versions. -->
