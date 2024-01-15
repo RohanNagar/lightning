@@ -38,7 +38,7 @@
     <jackson.api.version>2.16.1</jackson.api.version>
     <jackson.databind.version>2.16.1</jackson.databind.version>
     <junit.version>4.13.2</junit.version>
-    <mockito.version>5.8.0</mockito.version>
+    <mockito.version>5.9.0</mockito.version>
   </properties>
 
   <!-- Allows for releases into AWS S3. -->
