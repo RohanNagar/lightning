@@ -31,7 +31,7 @@
     <!-- Dependency versions. -->
     <dagger.version>2.51.1</dagger.version>
     <dropwizard.version>2.1.5</dropwizard.version>
-    <guava.version>33.1.0-jre</guava.version>
+    <guava.version>33.2.0-jre</guava.version>
     <thunder.version>3.1.0</thunder.version>
     <twitter4j.version>4.0.7</twitter4j.version>
     <restfb.version>3.24.0</restfb.version>
