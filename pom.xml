@@ -33,7 +33,7 @@
     <dropwizard.version>2.1.5</dropwizard.version>
     <guava.version>33.4.8-jre</guava.version>
     <thunder.version>3.1.0</thunder.version>
-    <twitter4j.version>4.0.7</twitter4j.version>
+    <twitter4j.version>4.1.2</twitter4j.version>
     <restfb.version>3.24.0</restfb.version>
     <jackson.api.version>2.19.1</jackson.api.version>
     <jackson.databind.version>2.19.1</jackson.databind.version>
