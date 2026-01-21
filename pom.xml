@@ -21,7 +21,7 @@
     <java.minimum.version>17</java.minimum.version>
 
     <!-- Plugin versions -->
-    <checkstyle.version>12.3.1</checkstyle.version>
+    <checkstyle.version>13.0.0</checkstyle.version>
     <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
     <compiler-plugin.version>3.14.1</compiler-plugin.version>
     <coveralls.version>4.3.0</coveralls.version>
